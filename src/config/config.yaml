@@ -1,0 +1,49 @@
+# s3:
+#     use_s3: !!bool "true"
+#     endpoint_url: "https://ecs.dsta.ai"
+#     aws_access_key_id: "tkahsion-ecs"
+#     aws_secret_access_key: "y0lJrsTh4EeOsGdlU7y3BHXsiiYlRlwh0KHq5myU"
+#     signature_version: "s3v4"
+#     region_name: "us-east-1"
+#     cert_path: !!bool "false" #"/usr/share/ca-certificates/extra/ca.dsta.ai.crt" 
+#     bucket: "data"
+#     s3_data_path: 'hyperopt_data' #"hyperopt_data"
+#     model_artifact_path: "traj_artifacts"
+# git:
+#     id: cskai
+#     key: cskaiP@ssw0rd
+
+# docker:
+#     base_image: "harbor.dsta.ai/public/traj-id-model:latest" 
+#     hyperparameter_base_image: "harbor.dsta.ai/public/hyperopt:latest"
+
+# clearml:
+#     project_name: "Trajectory Project"
+#     task_name: "Classification_FLAT-LR_200-ep_A11_MGPU"
+#     queue: "queue-4xV100-64ram"
+#     hyperparameter_project_name: 'Trajectory Project Hyperparameter Tuning A10'
+#     hyperparameter_task_name: 'BOHB Tuning'
+#     hyperparameter_queue: 'queue-1xV100-32ram'
+    
+data:
+    transforms:
+        text:
+            Word2Char:
+            ElmoChar2Index:
+
+        image:
+            Resize:
+                size: 256
+            CenterCrop:
+                size: 224
+            ToTensor:
+            NormalizeMeanStd:
+                mean:
+                    - 0.485
+                    - 0.456
+                    - 0.406
+                std:
+                    - 0.229
+                    - 0.224
+                    - 0.225
+                

@@ -1,0 +1,16 @@
+# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
+
+pandas
+tqdm
+pytorch-lightning
+torchvision
+clearml
+fastparquet
+matplotlib
+dask
+boto3
+fastparquet
+scikit-learn
+scikit-image
+Pillow
+allennlp
