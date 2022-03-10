@@ -1,10 +1,6 @@
-
 import os
 from pathlib import Path
-
 from clearml import Dataset, Task
-
-from visual_grounding_dataset import VisualGroundingDataCreator
 
 DATA_PROJECT_NAME = "datasets/multimodal"
 DATASET_NAME = "VisualGround_flicker"  # "VG_MSCOCO_FLICKR"
@@ -12,6 +8,7 @@ DATASET_NAME = "VisualGround_flicker"  # "VG_MSCOCO_FLICKR"
 TASK_NAME = "visual_grounding_training_data_generation"
 
 DATASET_ROOT = '/data/processed/'
+
 OUTPUT_URL = "s3://experiment-logging/multimodal"
 
 
@@ -20,25 +17,32 @@ task = Task.init(project_name=DATA_PROJECT_NAME, task_name=TASK_NAME)
 # task.set_base_docker(docker_image="dleongsh/audio_preproc:v1.0.0")
 task.set_base_docker(
     docker_image="python:3.8",
-    docker_setup_bash_script=['apt-get update',
-                              'apt-get install -y sox libsox-fmt-all', 'apt install -y ffmpeg'])
+    docker_setup_bash_script=['apt-get update -y',
+                              'apt-get upgrade -y',
+                              'pip install pandas clearml fastparquet boto3 dask',
+                              ])
 
 args = {
     'num_captions': 5,
-    'npartitions': 100,
+    'npartitions': 1000,
     'batch_size': 32,
-    'input_datasets': ['75c32c21d7b7490ba84e32d0a1593238']
+    'input_datasets': ['75c32c21d7b7490ba84e32d0a1593238','f5626d7f0cdb4b64807a6ff8f4e726d6','30c3d39e7bbf429e950225d8a062bcfb']
 }
 
 task.connect(args)
-task.execute_remotely()
-
+task.execute_remotely(queue_name='cpu-only')
+from visual_grounding_dataset import VisualGroundingDataCreator
 input_train_dataset_paths = []
 input_valid_dataset_paths = []
 input_image_folder_paths = []
+
+TEMP_PATH = '/tmp'
+if not os.path.exists(TEMP_PATH):
+    os.makedirs(TEMP_PATH)
 for dataset_id in args['input_datasets']:
     dataset = Dataset.get(dataset_id=dataset_id)
-    local_root_path = dataset.get_local_copy()
+    local_root_path = dataset.get_mutable_local_copy(
+        os.path.join(TEMP_PATH, dataset_id))
 
     input_train_dataset_paths.append(os.path.join(
         local_root_path, 'train_manifest.csv'))
@@ -54,8 +58,6 @@ for dataset_id in args['input_datasets']:
         input_valid_dataset_paths.append(valid_path)
 
 
-print('input train dataset paths', input_train_dataset_paths)
-print('input valid dataset paths', input_valid_dataset_paths)
 
 vg_data_creator = VisualGroundingDataCreator(
     num_captions=args['num_captions'], nparitions=args['npartitions'], batch_size=args['batch_size'])

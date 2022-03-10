@@ -24,7 +24,7 @@ class VisualGroundingDataCreator():
 
         manifest_df = []
         for manifest in list_of_manifest:
-            single_manifest_df = pd.read_csv(manifest).head(200)
+            single_manifest_df = pd.read_csv(manifest)
             manifest_df.append(single_manifest_df)
         manifest_df = pd.concat(manifest_df, ignore_index=True)
 
