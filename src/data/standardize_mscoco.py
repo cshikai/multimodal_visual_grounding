@@ -44,6 +44,8 @@ class MscocoStandardizer():
 
         #         # break
         manifest = pd.DataFrame(manifest)
+        manifest['caption'] = manifest['caption'].apply(
+            lambda x: x.strip(' ').strip('.').strip(' ').strip('\n')+'.')
         manifest.to_csv(output_manifest, index=False)
 
 

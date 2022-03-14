@@ -28,25 +28,29 @@ class VisualGroundingDataCreator():
             manifest_df.append(single_manifest_df)
         manifest_df = pd.concat(manifest_df, ignore_index=True)
 
+        print('Extracting the top {} captions'.format(self.num_captions))
         manifest_df = manifest_df.groupby(
             'filename').apply(lambda x: x.head(self.num_captions)).reset_index(drop=True)
 
+        print('Assigning image to a cluster')
         manifest_df['cluster_number'] = manifest_df.groupby(
             'filename').ngroup() // self.batch_size
 
+        print('Assigning caption number for each image')
         manifest_df['intra_group_number'] = manifest_df.groupby(
             'filename')['cluster_number'].rank('first')
 
+        print('Assigning batch number based on cluster and caption number')
         manifest_df['batch_number'] = manifest_df.groupby(
             ['cluster_number', 'intra_group_number']).ngroup()
 
+        print('Sorting dataset based on batch number')
         manifest_df = manifest_df.sort_values(
             by=['batch_number'], ascending=True)\
             .reset_index(drop=True)\
             .drop(columns=['cluster_number', 'intra_group_number'])
 
-        print(manifest_df)
-
+        print('Creating Dask Dataset')
         dask_df = dd.from_pandas(manifest_df, npartitions=self.npartitions)
         # only fastparquet preserve categoricals
         dask_df.to_parquet(os.path.join(

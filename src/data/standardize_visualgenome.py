@@ -30,7 +30,12 @@ class VgStandardizer():
 
                 for k in i['regions']:
                     single_image_manifest['filename'].append(filename)
-                    single_image_manifest['caption'].append(k['phrase'])
+                    phrase = k['phrase']
+                    phrase = phrase[0].upper(
+                    ) + phrase[1:].lower()
+                    phrase = phrase.strip(' ').strip(
+                        '.').strip(' ').strip('\n')+'.'
+                    single_image_manifest['caption'].append(phrase)
                     single_image_manifest['size'].append(
                         k['width']*k['height'])
 

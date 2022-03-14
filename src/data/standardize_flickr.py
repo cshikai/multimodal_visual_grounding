@@ -20,7 +20,7 @@ class FlickrStandardizer():
 
                 manifest['filename'].append('flickr/'+filename)
                 manifest['caption'].append(
-                    caption.strip(' .\n').strip('''"'''))
+                    caption.strip(' .\n').strip('''"''')+'.')
 
                 # break
         manifest = pd.DataFrame(manifest)

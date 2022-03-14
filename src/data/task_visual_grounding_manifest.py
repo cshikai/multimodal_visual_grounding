@@ -1,9 +1,10 @@
+
 import os
 from pathlib import Path
 from clearml import Dataset, Task
 
 DATA_PROJECT_NAME = "datasets/multimodal"
-DATASET_NAME = "VisualGround_VG_MSCOCO_FLICKR"
+DATASET_NAME = "VisualGround_VG_MSCOCO_FLICKR_manifest"
 
 TASK_NAME = "visual_grounding_training_data_generation"
 
@@ -26,11 +27,12 @@ args = {
     'num_captions': 5,
     'npartitions': 1000,
     'batch_size': 32,
-    'input_datasets': ['75c32c21d7b7490ba84e32d0a1593238', 'f5626d7f0cdb4b64807a6ff8f4e726d6', '30c3d39e7bbf429e950225d8a062bcfb']
+    'input_datasets': ['e847c1e7941649d3b86b72ad4469bbc6', '71a397b04b5d476bb5543306269e28af', '9046f29f7851455380d7b0eebd99fa8a']
 }
 
 task.connect(args)
 task.execute_remotely(queue_name='cpu-only')
+
 from visual_grounding_dataset import VisualGroundingDataCreator
 input_train_dataset_paths = []
 input_valid_dataset_paths = []
@@ -61,6 +63,7 @@ for dataset_id in args['input_datasets']:
 vg_data_creator = VisualGroundingDataCreator(
     num_captions=args['num_captions'], nparitions=args['npartitions'], batch_size=args['batch_size'])
 
+
 processed_train_path = os.path.join(DATASET_ROOT, 'train')
 processed_valid_path = os.path.join(DATASET_ROOT, 'valid')
 
@@ -71,9 +74,6 @@ vg_data_creator.create(input_valid_dataset_paths, processed_valid_path)
 
 vg_data_creator.create(input_train_dataset_paths, processed_train_path)
 
-for image_folder_path in input_image_folder_paths:
-    os.rename(image_folder_path, os.path.join(
-        DATASET_ROOT, Path(image_folder_path).stem))
 
 clearml_dataset = Dataset.create(
     dataset_project=DATA_PROJECT_NAME, dataset_name=DATASET_NAME)
