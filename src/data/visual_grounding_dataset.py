@@ -52,11 +52,15 @@ class VisualGroundingDataCreator():
 
         print('Creating Dask Dataset')
         dask_df = dd.from_pandas(manifest_df, npartitions=self.npartitions)
+
+        # dask_df = dask_df.set_index('batch_number', sorted=True)
         # only fastparquet preserve categoricals
+        print('Saving Dask Dataset')
         dask_df.to_parquet(os.path.join(
             destination_folder, 'data.parquet'), engine='fastparquet')
 
 
 if __name__ == '__main__':
     dc = VisualGroundingDataCreator(num_captions=5, nparitions=100)
-    dc.create(['/data/train_manifest.csv'], '/data/train')
+    dc.create(['/data/manifest/flickr/valid_manifest.csv', '/data/manifest/mscoco/valid_manifest.csv',
+              '/data/manifest/vg/valid_manifest.csv'], '/data/valid')

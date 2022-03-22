@@ -12,8 +12,8 @@ services:
       - ../src:/src
       - ../data:/data
       - ../models:/models
-    # ports:
-    #   - 8887:8887
+    ports:
+      - 8888:8888
     #   - 6006:6006
     ulimits:
       memlock: -1 # set upper limit for how much memory is locked for the container (-1 means lock as much as the container uses)

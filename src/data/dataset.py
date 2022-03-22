@@ -1,7 +1,6 @@
 from typing import Dict, Tuple
 import os
 
-import torch
 from torch.utils.data import Dataset
 import dask.dataframe as dd
 from PIL import Image
@@ -24,7 +23,7 @@ class VisualGroundingDataset(Dataset):
 
         self.preprocessor = PreProcessor(cfg)
 
-    def __len__(self):
+    def __len__(self) -> int:
         '''
         Get the length of dataset.
         '''
@@ -41,10 +40,10 @@ class VisualGroundingDataset(Dataset):
 
         # data values loaded are between 0 and 255, with the shape [h,w,c], c is the number of channels , usually RGB. both PIL and skimages will achieve this
         image = Image.open(os.path.join(
-            self.root_folder, data_slice['filename'].values[0]))
+            self.DATA_ROOT, data_slice['filename'].values[0]))
 
         text = data_slice['caption'].values[0]
 
-        image, text = self.preprocessor((image, text))
+        image, text, length = self.preprocessor((image, text))
 
-        return image, text
+        return image, text, length
