@@ -1,31 +1,25 @@
-# s3:
-#     use_s3: !!bool "true"
-#     endpoint_url: "https://ecs.dsta.ai"
-#     aws_access_key_id: "tkahsion-ecs"
-#     aws_secret_access_key: "y0lJrsTh4EeOsGdlU7y3BHXsiiYlRlwh0KHq5myU"
-#     signature_version: "s3v4"
-#     region_name: "us-east-1"
-#     cert_path: !!bool "false" #"/usr/share/ca-certificates/extra/ca.dsta.ai.crt" 
-#     bucket: "data"
-#     s3_data_path: 'hyperopt_data' #"hyperopt_data"
-#     model_artifact_path: "traj_artifacts"
-# git:
-#     id: cskai
-#     key: cskaiP@ssw0rd
-
-# docker:
-#     base_image: "harbor.dsta.ai/public/traj-id-model:latest" 
-#     hyperparameter_base_image: "harbor.dsta.ai/public/hyperopt:latest"
-
-# clearml:
-#     project_name: "Trajectory Project"
-#     task_name: "Classification_FLAT-LR_200-ep_A11_MGPU"
-#     queue: "queue-4xV100-64ram"
-#     hyperparameter_project_name: 'Trajectory Project Hyperparameter Tuning A10'
-#     hyperparameter_task_name: 'BOHB Tuning'
-#     hyperparameter_queue: 'queue-1xV100-32ram'
+clearml:
+    project_name: multimodal
+    task_name: visual_grounding_training
+    output_url : s3://experiment-logging/multimodal
+    base_image: "harbor.dsta.ai/public/traj-id-model:latest"
+    queue: "compute"
+    # hyperparameter_project_name: 'multimodal Hyperparameter Tuning'
+    # hyperparameter_task_name: 'BOHB Tuning'
+    # hyperparameter_queue: 'queue-1xV100-32ram'
     
 data:
+    clearml_datasets:
+        manifest:
+            id: ab4ccbef42d646b28c4fe29b933a15ce
+            path: '/data/' 
+        # mscoco:
+        #     id: 22a9794ba449430aa5c498fae90a8cc8
+        #     path: '/data/mscoco/'
+        # flickr:
+        #     id: 4b07c0410f704e61b4ce0157208c09fd
+        #     path: '/data/flickr/'
+    
     transforms:
         text:
             Word2Char:
@@ -50,4 +44,60 @@ model:
     embeddings:
         elmo:
             dropout: 0.5
+    feature_hidden_dimension: 1024 #1024
+    leaky_relu_alpha: 0.25
+    textual:
+
+        lstm:
+            input_dims: 1024
+            num_layers: 2
+            dropout: 0.0
+    
+    visual:
+        num_conv : 3
+        heatmap_dim: 18
+        num_features: 4 
+    
+    loss:
+        gamma_1: 5
+        gamma_2: 10
+training:
+
+    input_models:
+        vgg: 
+            id: f1087001724241e79eb24c4c38e5bc1a
+            path: '/models/vgg/c466539746bac9f0534936c455bb5e2d.vgg16-397923af.pth'
+        elmo: 
+            id: 6ec38b0aefb843179508a906c7cd62dc
+            path: '/models/elmo/'
+
+    resume_from_checkpoint: 0 # 0 or 1
+    trained_model_id: '/models/trained_models/'
+    local_trained_model_path: '/models/trained_models/'
+    model_save_period: 1 # models are saved at the end of every <model_save_period> epoch
+    log_every_n_steps : 2 #logs are written every <log_every_n_steps> steps
+
+    seed: 123
+    num_workers: 6
+    batch_size: 2
+    n_gpu: 1
+    accelerator: 'ddp'
+    
+    epochs: 20
+    learning_rate: 0.001 #half at 10 and again at 15
+    auto_lr: 0 # boolean either 1 or 0 
+    lr_schedule:
+        scheduler: null #string or null #'lr_cyclic' or 'lr_decay'
+        lr_decay:  #check pytoch's ReduceLROnPlateau for argument meaning
+            factor: 0.5
+            patience: 5
+            cooldown: 0
+            eps: 0
+            metric_to_track: 'val_loss'
+        lr_cyclic:
+            mode: 'triangular' #'triangular2' , 'exp_range'
+            lower_lr: 0.00001
+            epoch_size_up: 5 #epoch , not step
+            epoch_size_down: 5 #epoch, not step
+
                 

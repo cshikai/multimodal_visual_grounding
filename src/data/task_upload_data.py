@@ -2,8 +2,8 @@
 from clearml import Dataset
 
 PROJECT_NAME = "datasets/multimodal"
-DATASET_NAME = "visualgenome_manifest"
-DATASET_ROOT = '../../data/manifest/vg'
+DATASET_NAME = "visualgenome"
+DATASET_ROOT = '../../data/VG/'
 OUTPUT_URL = "s3://experiment-logging/multimodal"
 
 

@@ -13,7 +13,7 @@ class VisualGroundingDataset(Dataset):
     """
     DATA_ROOT = '/data'
 
-    def __init__(self, mode: str, cfg: Dict) -> None:
+    def __init__(self, mode: str, preprocessor: PreProcessor) -> None:
         """
         """
         self.root_folder = os.path.join(self.DATA_ROOT, mode)
@@ -21,7 +21,7 @@ class VisualGroundingDataset(Dataset):
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory
 
-        self.preprocessor = PreProcessor(cfg)
+        self.preprocessor = preprocessor
 
     def __len__(self) -> int:
         '''
@@ -36,14 +36,20 @@ class VisualGroundingDataset(Dataset):
         1) normalized features of dataset
         2) labels of dataset (one-hot encoded and labels_dct)
         '''
+        # print('loading image number', index)
         data_slice = self.data.loc[index].compute()
 
         # data values loaded are between 0 and 255, with the shape [h,w,c], c is the number of channels , usually RGB. both PIL and skimages will achieve this
+        # print('opening image', index)
         image = Image.open(os.path.join(
             self.DATA_ROOT, data_slice['filename'].values[0]))
 
+        # print('reading cap', index)
         text = data_slice['caption'].values[0]
 
+        # print('processing img and text', index)
         image, text, length = self.preprocessor((image, text))
+
+        # print('loaded image number', index)
 
         return image, text, length
