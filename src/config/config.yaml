@@ -2,7 +2,7 @@ clearml:
     project_name: multimodal
     task_name: visual_grounding_training
     output_url : s3://experiment-logging/multimodal
-    base_image: "harbor.dsta.ai/public/traj-id-model:latest"
+    base_image: "cshikai/multimodal_visual_grounding:1.0.0"
     queue: "compute"
     # hyperparameter_project_name: 'multimodal Hyperparameter Tuning'
     # hyperparameter_task_name: 'BOHB Tuning'
@@ -13,12 +13,15 @@ data:
         manifest:
             id: ab4ccbef42d646b28c4fe29b933a15ce
             path: '/data/' 
-        # mscoco:
-        #     id: 22a9794ba449430aa5c498fae90a8cc8
-        #     path: '/data/mscoco/'
-        # flickr:
-        #     id: 4b07c0410f704e61b4ce0157208c09fd
-        #     path: '/data/flickr/'
+        mscoco:
+            id: 22a9794ba449430aa5c498fae90a8cc8
+            path: '/data/'
+        flickr:
+            id: 4b07c0410f704e61b4ce0157208c09fd
+            path: '/data/'
+        visualgenome:
+            id: b589ad32f99849b5a97f4b944ff9a708
+            path: '/data/'
     
     transforms:
         text:
@@ -78,8 +81,8 @@ training:
     log_every_n_steps : 2 #logs are written every <log_every_n_steps> steps
 
     seed: 123
-    num_workers: 6
-    batch_size: 2
+    num_workers: 12
+    batch_size: 32
     n_gpu: 1
     accelerator: 'ddp'
     

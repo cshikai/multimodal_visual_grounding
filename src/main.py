@@ -42,17 +42,13 @@ if __name__ == '__main__':
     # # Task.add_requirements("hydra-core")
     # # Task.add_requirements("pytorch-lightning")
 
-    # task = Task.init(project_name=PROJECT_NAME,
-    #                  task_name=TASK_NAME, output_uri=OUTPUT_URL)
-    # task.set_base_docker(
-    #     docker_image= cfg['clearml']['base_image'],
-    #     # docker_setup_bash_script=['apt-get update -y',
-    #     #                           'apt-get upgrade -y',
-    #     #                           'pip install pandas clearml fastparquet boto3 dask',
-    #     #                           ]
-    # )
-    # task.connect(cfg)
-    # task.execute_remotely(queue_name= cfg['clearml']['queue'], exit_process=True)
+    task = Task.init(project_name=PROJECT_NAME,
+                     task_name=TASK_NAME, output_uri=OUTPUT_URL)
+    task.set_base_docker(
+        docker_image=cfg['clearml']['base_image'])
+    task.connect(cfg)
+    task.execute_remotely(
+        queue_name=cfg['clearml']['queue'], exit_process=True)
     # print('done')
 
     from experiment import Experiment
@@ -61,7 +57,10 @@ if __name__ == '__main__':
         set_start_method('spawn')
     except RuntimeError:
         pass
-    task = None
+
+    download_models(cfg)
+    download_datasets(cfg)
+
     exp = Experiment(cfg, task)
     exp.run_experiment()
     # exp.create_torchscript_model('class_model_v2.ckpt')
