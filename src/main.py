@@ -39,19 +39,19 @@ if __name__ == '__main__':
     TASK_NAME = cfg['clearml']['task_name']
     OUTPUT_URL = cfg['clearml']['output_url']
 
-    # # Task.force_requirements_env_freeze(
-    # #     force=True, requirements_file="requirements.txt")
-    # # Task.add_requirements("git+https://github.com/huggingface/datasets.git")
-    # # Task.add_requirements("hydra-core")
-    # # Task.add_requirements("pytorch-lightning")
+    # Task.force_requirements_env_freeze(
+    #     force=True, requirements_file="requirements.txt")
+    # Task.add_requirements("git+https://github.com/huggingface/datasets.git")
+    # Task.add_requirements("hydra-core")
+    # Task.add_requirements("pytorch-lightning")
 
     task = Task.init(project_name=PROJECT_NAME,
                      task_name=TASK_NAME, output_uri=OUTPUT_URL)
     task.set_base_docker(
         docker_image=cfg['clearml']['base_image'],
-        # docker_setup_bash_script=[
-        #     'pip install virtualenv',
-        # ]
+        docker_setup_bash_script=[
+            'pip install pandas',
+        ]
     )
     task.connect(cfg)
     task.execute_remotely(
