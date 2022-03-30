@@ -1,9 +1,9 @@
 clearml:
     project_name: multimodal
-    task_name: visual_grounding_training_1
+    task_name: visual_grounding_training
     output_url : s3://experiment-logging/multimodal
     base_image: "cshikai/multimodal_visual_ground:1.0.1"
-    queue: "compute"
+    queue: "compute3"
     # hyperparameter_project_name: 'multimodal Hyperparameter Tuning'
     # hyperparameter_task_name: 'BOHB Tuning'
     # hyperparameter_queue: 'queue-1xV100-32ram'
