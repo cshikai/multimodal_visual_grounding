@@ -17,7 +17,10 @@ def download_datasets(cfg: Dict) -> None:
         dataset_path = cfg['data']['clearml_datasets'][dataset]['path']
         if not os.path.exists(dataset_path):
             os.makedirs(dataset_path)
-        os.rename(local_root_path, dataset_path)
+        for f in os.listdir(local_root_path):
+            full_f = os.path.join(local_root_path, f)
+            new_f = os.path.join(dataset_path, f)
+            os.rename(full_f, new_f)
 
 
 def download_models(cfg: Dict) -> None:
@@ -45,7 +48,11 @@ if __name__ == '__main__':
     task = Task.init(project_name=PROJECT_NAME,
                      task_name=TASK_NAME, output_uri=OUTPUT_URL)
     task.set_base_docker(
-        docker_image=cfg['clearml']['base_image'])
+        docker_image=cfg['clearml']['base_image'],
+        # docker_setup_bash_script=[
+        #     'pip install virtualenv',
+        # ]
+    )
     task.connect(cfg)
     task.execute_remotely(
         queue_name=cfg['clearml']['queue'], exit_process=True)
