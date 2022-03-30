@@ -2,8 +2,8 @@ clearml:
     project_name: multimodal
     task_name: visual_grounding_training
     output_url : s3://experiment-logging/multimodal
-    base_image: "cshikai/multimodal_visual_ground:1.0.1"
-    queue: "compute3"
+    base_image: nvidia/cuda:11.4.0-cudnn8-devel-ubuntu20.04 #"cshikai/multimodal_visual_ground:1.0.1"
+    queue: "compute"
     # hyperparameter_project_name: 'multimodal Hyperparameter Tuning'
     # hyperparameter_task_name: 'BOHB Tuning'
     # hyperparameter_queue: 'queue-1xV100-32ram'
