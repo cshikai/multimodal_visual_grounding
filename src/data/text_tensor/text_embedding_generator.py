@@ -74,14 +74,13 @@ class EmbeddingGenerator():
 
             torch.save(
                 output, '/data/embeddings/train/text/{}'.format(batch_index[0]))
-            break
+
         for batch in self.valid_loader:
             batch_text, batch_index = batch
             output = self.model(batch_text.cuda()).squeeze(0)
 
             torch.save(
                 output, '/data/embeddings/valid/text/{}'.format(batch_index[0]))
-            break
 
     @staticmethod
     def create_torchscript_model(model_name: str) -> None:

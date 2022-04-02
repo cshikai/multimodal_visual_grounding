@@ -61,7 +61,6 @@ if __name__ == '__main__':
     download_models(cfg)
     download_datasets(cfg)
     task = None
-
     eg = EmbeddingGenerator(cfg, task)
     eg.run(DATASET_ROOT)
 
