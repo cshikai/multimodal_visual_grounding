@@ -84,7 +84,7 @@ class EmbeddingGenerator():
 
                 torch.save(
                     single, '/data/embeddings/train/text/{}'.format(idx))
-            break
+            print('saved embeddings to file system')
 
         valid_len = len(self.valid_dataset)
         for batch in self.valid_loader:
@@ -99,6 +99,7 @@ class EmbeddingGenerator():
 
                 torch.save(
                     single, '/data/embeddings/valid/text/{}'.format(idx))
+            print('saved embeddings to file system')
 
     @staticmethod
     def create_torchscript_model(model_name: str) -> None:

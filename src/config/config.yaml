@@ -19,9 +19,9 @@ data:
         # mscoco:
         #     id: 22a9794ba449430aa5c498fae90a8cc8
         #     path: '/data/'
-        flickr:
-            id: 4b07c0410f704e61b4ce0157208c09fd
-            path: '/data/'
+        # flickr:
+        #     id: 4b07c0410f704e61b4ce0157208c09fd
+        #     path: '/data/'
         # visualgenome:
         #     id: b589ad32f99849b5a97f4b944ff9a708
         #     path: '/data/'
