@@ -24,7 +24,7 @@ class EmbeddingGenerator():
         self.clearml_task = clearml_task
         self.cfg = cfg
 
-    def run(self) -> None:
+    def run(self, dataset_root) -> None:
         # if os.path.exists(self.checkpoint_dir):
         #     shutil.rmtree(self.checkpoint_dir)
 
@@ -37,7 +37,7 @@ class EmbeddingGenerator():
 
         self._initialize_model()
 
-        self._generate()
+        self._generate(dataset_root)
 
     def _initialize_model(self) -> None:
         self.model = Elmo(self.cfg)
