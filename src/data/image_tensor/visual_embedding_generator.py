@@ -68,18 +68,19 @@ class EmbeddingGenerator():
 
             if not os.path.exists(path):
                 os.makedirs(path)
+        train_len = len(self.train_dataset)
         for batch in self.train_loader:
             batch_image, batch_index = batch
             index = batch_index[0]
             output = self.model(batch_image.cuda())
 
             if index % REPORT_INTERVAL == 0:
-                print('processing train image of index {}'.format(index))
+                print('processing train image {}/{} '.format(index+1, train_len))
 
             torch.save(
                 output, '/data/embeddings/train/image/{}'.format(index))
-            break
 
+        valid_len = len(self.valid_dataset)
         for batch in self.valid_loader:
 
             batch_image, batch_index = batch
@@ -87,11 +88,10 @@ class EmbeddingGenerator():
 
             output = self.model(batch_image.cuda())
             if index % REPORT_INTERVAL == 0:
-                print('processing valid image of index {}'.format(index))
+                print('processing valid image {}/{} '.format(index+1, valid_len))
 
             torch.save(
                 output, '/data/embeddings/valid/image/{}'.format(index))
-            break
 
     @staticmethod
     def create_torchscript_model(model_name: str) -> None:

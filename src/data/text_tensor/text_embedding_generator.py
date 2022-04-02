@@ -68,23 +68,24 @@ class EmbeddingGenerator():
 
             if not os.path.exists(path):
                 os.makedirs(path)
+        train_len = len(self.train_dataset)
         for batch in self.train_loader:
             batch_text, batch_index = batch
             index = batch_index[0]
             output = self.model(batch_text.cuda()).squeeze(0)
 
             if index % REPORT_INTERVAL == 0:
-                print('processing valid image of index {}'.format(index))
+                print('processing train text {}/{} '.format(index+1, train_len))
 
             torch.save(
                 output, '/data/embeddings/train/text/{}'.format(index))
-
+        valid_len = len(self.valid_dataset)
         for batch in self.valid_loader:
             batch_text, batch_index = batch
             output = self.model(batch_text.cuda()).squeeze(0)
 
             if index % REPORT_INTERVAL == 0:
-                print('processing valid image of index {}'.format(index))
+                print('processing valid text {}/{} '.format(index+1, valid_len))
 
             torch.save(
                 output, '/data/embeddings/valid/text/{}'.format(index))

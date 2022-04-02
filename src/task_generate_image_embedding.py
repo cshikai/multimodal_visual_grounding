@@ -54,7 +54,6 @@ if __name__ == '__main__':
     task.connect(cfg)
     task.execute_remotely(
         queue_name=cfg['clearml']['queue'], exit_process=True)
-    # print('done')
 
     from data.image_tensor.visual_embedding_generator import EmbeddingGenerator
 
