@@ -18,8 +18,10 @@ from .preprocessor import PreProcessor
 
 
 class EmbeddingGenerator():
-
+    REPORT_INTERVAL = 1
+    BATCH_SIZE = 256*2
    # should init as arguments here
+
     def __init__(self, cfg: Dict, clearml_task=None) -> None:
         self.clearml_task = clearml_task
         self.cfg = cfg
@@ -43,19 +45,19 @@ class EmbeddingGenerator():
         self.model = Elmo(self.cfg)
 
     def _set_datasets(self) -> None:
-        preprocessor = PreProcessor(cfg)
-        self.train_dataset = VGTextDataset('train', preprocessor)
-        self.valid_dataset = VGTextDataset('valid', preprocessor)
+
+        self.train_dataset = VGTextDataset('train', cfg)
+        self.valid_dataset = VGTextDataset('valid', cfg)
 
     def _set_dataloaders(self) -> None:
         # self.cfg['training']['batch_size']
         self.train_loader = DataLoader(self.train_dataset, collate_fn=self.train_dataset.preprocessor.collate,
-                                       batch_size=1, shuffle=False, num_workers=self.cfg['training']['num_workers'])
+                                       batch_size=self.BATCH_SIZE, shuffle=False, num_workers=self.cfg['training']['num_workers'])
         self.valid_loader = DataLoader(self.valid_dataset, collate_fn=self.valid_dataset.preprocessor.collate,
-                                       batch_size=1, shuffle=False, num_workers=self.cfg['training']['num_workers'])
+                                       batch_size=self.BATCH_SIZE, shuffle=False, num_workers=self.cfg['training']['num_workers'])
 
     def _generate(self, dataset_root):
-        REPORT_INTERVAL = 100
+
         folders = ['train', 'valid']
 
         self.model.cuda()
@@ -70,25 +72,33 @@ class EmbeddingGenerator():
                 os.makedirs(path)
         train_len = len(self.train_dataset)
         for batch in self.train_loader:
-            batch_text, batch_index = batch
-            index = batch_index[0]
-            output = self.model(batch_text.cuda()).squeeze(0)
+            batch_text, batch_index, batch_len = batch
+            index = min(batch_index)
+            output = self.model(batch_text.cuda())
 
-            if index % REPORT_INTERVAL == 0:
+            if index % self.REPORT_INTERVAL == 0:
                 print('processing train text {}/{} '.format(index+1, train_len))
 
-            torch.save(
-                output, '/data/embeddings/train/text/{}'.format(index))
+            for number, idx in enumerate(batch_index):
+                single = output[number, :batch_len[number], ...].clone()
+
+                torch.save(
+                    single, '/data/embeddings/train/text/{}'.format(idx))
+            break
+
         valid_len = len(self.valid_dataset)
         for batch in self.valid_loader:
-            batch_text, batch_index = batch
-            output = self.model(batch_text.cuda()).squeeze(0)
-
-            if index % REPORT_INTERVAL == 0:
+            batch_text, batch_index, batch_len = batch
+            output = self.model(batch_text.cuda())
+            index = min(batch_index)
+            if index % self.REPORT_INTERVAL == 0:
                 print('processing valid text {}/{} '.format(index+1, valid_len))
 
-            torch.save(
-                output, '/data/embeddings/valid/text/{}'.format(index))
+            for number, idx in enumerate(batch_index):
+                single = output[number, :batch_len[number], ...].clone()
+
+                torch.save(
+                    single, '/data/embeddings/valid/text/{}'.format(idx))
 
     @staticmethod
     def create_torchscript_model(model_name: str) -> None:

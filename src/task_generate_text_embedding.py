@@ -54,13 +54,18 @@ if __name__ == '__main__':
     task.connect(cfg)
     task.execute_remotely(
         queue_name=cfg['clearml']['queue'], exit_process=True)
-    # print('done')
 
     from data.text_tensor.text_embedding_generator import EmbeddingGenerator
 
     download_models(cfg)
     download_datasets(cfg)
-    task = None
+
+    from torch.multiprocessing import set_start_method
+    try:
+        set_start_method('spawn')
+    except RuntimeError:
+        pass
+
     eg = EmbeddingGenerator(cfg, task)
     eg.run(DATASET_ROOT)
 
