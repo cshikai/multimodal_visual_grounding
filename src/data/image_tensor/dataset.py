@@ -13,7 +13,7 @@ class VGImageDataset(Dataset):
     """
     DATA_ROOT = '/data'
 
-    def __init__(self, mode: str, preprocessor: PreProcessor) -> None:
+    def __init__(self, mode: str, cfg: Dict) -> None:
         """
         """
         self.root_folder = os.path.join(self.DATA_ROOT, mode)
@@ -21,7 +21,7 @@ class VGImageDataset(Dataset):
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory
 
-        self.preprocessor = preprocessor
+        self.preprocessor = PreProcessor(cfg)
 
     def __len__(self) -> int:
         '''

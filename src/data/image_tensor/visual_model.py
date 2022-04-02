@@ -56,9 +56,8 @@ class VGG(pl.LightningModule):
         _out = self.pretrained_model(x)
         output = []
         for l in self.FEATURE_LAYERS_ID:
-            print(self.raw_visual_features[l].shape)
             output.append(self.resize(self.raw_visual_features[l]))
 
-        output = torch.cat(output, 0)
+        output = torch.stack(output, 1)
 
         return output
