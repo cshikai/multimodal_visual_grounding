@@ -3,6 +3,7 @@ version: '3.4'
 services:
     
   model_training: 
+    runtime: nvidia
     build: ../ 
     # image: intel_model_model
     stdin_open: true

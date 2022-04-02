@@ -51,6 +51,7 @@ class VisualGroundingDataCreator():
             .drop(columns=['cluster_number', 'intra_group_number'])
 
         print('Creating Dask Dataset')
+        print(manifest_df)
         dask_df = dd.from_pandas(manifest_df, npartitions=self.npartitions)
 
         # dask_df = dask_df.set_index('batch_number', sorted=True)
@@ -62,5 +63,5 @@ class VisualGroundingDataCreator():
 
 if __name__ == '__main__':
     dc = VisualGroundingDataCreator(num_captions=5, nparitions=100)
-    dc.create(['/data/manifest/flickr/valid_manifest.csv', '/data/manifest/mscoco/valid_manifest.csv',
-              '/data/manifest/vg/valid_manifest.csv'], '/data/valid')
+    dc.create(['/data/manifest/flickr/valid_manifest.csv'], '/data/valid')
+    dc.create(['/data/manifest/flickr/train_manifest.csv'], '/data/train')

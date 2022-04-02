@@ -1,4 +1,5 @@
 
+
 import os
 from pathlib import Path
 from clearml import Dataset, Task
@@ -26,15 +27,14 @@ task.set_base_docker(
 args = {
 
     'num_captions': 5,
-    'npartitions': 1000,
-    'batch_size': 32,
-    'input_manifests': ['e847c1e7941649d3b86b72ad4469bbc6', '71a397b04b5d476bb5543306269e28af', '9046f29f7851455380d7b0eebd99fa8a'],
-    'dataset_name': "VisualGround_VG_MSCOCO_FLICKR_manifest_1000paritions"
+    'npartitions': 100,
+    'batch_size': 4,
+    'input_manifests': ['e847c1e7941649d3b86b72ad4469bbc6', ],
+    'dataset_name': "VisualGround_FLICKR_manifest_100paritions_4_batch"
 }
 
 task.connect(args)
 task.execute_remotely(queue_name='cpu-only')
-
 from visual_grounding_dataset import VisualGroundingDataCreator
 input_train_dataset_paths = []
 input_valid_dataset_paths = []

@@ -2,7 +2,7 @@ clearml:
     project_name: multimodal
     task_name: visual_grounding_training
     output_url : s3://experiment-logging/multimodal
-    base_image: nvcr.io/nvidia/pytorch:22.01-py3 #nvidia/cuda:11.4.0-cudnn8-devel-ubuntu20.04 #"cshikai/multimodal_visual_ground:1.0.1"
+    base_image: cshikai/multimodal_visual_ground:1.0.1 #nvcr.io/nvidia/pytorch:22.01-py3 #nvidia/cuda:11.4.0-cudnn8-devel-ubuntu20.04 #"cshikai/multimodal_visual_ground:1.0.1"
     queue: "compute"
     # hyperparameter_project_name: 'multimodal Hyperparameter Tuning'
     # hyperparameter_task_name: 'BOHB Tuning'
@@ -10,18 +10,21 @@ clearml:
     
 data:
     clearml_datasets:
-        manifest:
-            id: ab4ccbef42d646b28c4fe29b933a15ce
-            path: '/data/' 
-        mscoco:
-            id: 22a9794ba449430aa5c498fae90a8cc8
+        flickr_manifest:
+            id: 03b19522a67b40a7ba138605f0080160
             path: '/data/'
-        flickr:
-            id: 4b07c0410f704e61b4ce0157208c09fd
-            path: '/data/'
-        visualgenome:
-            id: b589ad32f99849b5a97f4b944ff9a708
-            path: '/data/'
+        # full_manifest:
+        #     id: #ab4ccbef42d646b28c4fe29b933a15ce
+        #     path: '/data/' 
+        # mscoco:
+        #     id: 22a9794ba449430aa5c498fae90a8cc8
+        #     path: '/data/'
+        # flickr:
+        #     id: 4b07c0410f704e61b4ce0157208c09fd
+        #     path: '/data/'
+        # visualgenome:
+        #     id: b589ad32f99849b5a97f4b944ff9a708
+        #     path: '/data/'
     
     transforms:
         text:
@@ -67,9 +70,9 @@ model:
 training:
 
     input_models:
-        vgg: 
-            id: f1087001724241e79eb24c4c38e5bc1a
-            path: '/models/vgg/c466539746bac9f0534936c455bb5e2d.vgg16-397923af.pth'
+        # vgg: 
+        #     id: f1087001724241e79eb24c4c38e5bc1a
+        #     path: '/models/vgg/c466539746bac9f0534936c455bb5e2d.vgg16-397923af.pth'
         elmo: 
             id: 6ec38b0aefb843179508a906c7cd62dc
             path: '/models/elmo/'
@@ -81,8 +84,8 @@ training:
     log_every_n_steps : 2 #logs are written every <log_every_n_steps> steps
 
     seed: 123
-    num_workers: 12
-    batch_size: 32
+    num_workers: 0
+    batch_size: 8
     n_gpu: 1
     accelerator: 'ddp'
     
