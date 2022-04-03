@@ -72,6 +72,7 @@ class EmbeddingGenerator():
                 os.makedirs(path)
         train_len = len(self.train_dataset)
         for batch in self.train_loader:
+            print('Starting batch...')
             batch_text, batch_index, batch_len = batch
             index = min(batch_index)
             output = self.model(batch_text.cuda())
@@ -88,6 +89,7 @@ class EmbeddingGenerator():
 
         valid_len = len(self.valid_dataset)
         for batch in self.valid_loader:
+            print('Starting batch...')
             batch_text, batch_index, batch_len = batch
             output = self.model(batch_text.cuda())
             index = min(batch_index)
