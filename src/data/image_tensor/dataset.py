@@ -11,12 +11,12 @@ from .preprocessor import PreProcessor
 class VGImageDataset(Dataset):
     """
     """
-    DATA_ROOT = '/data'
+    DATA_ROOT = '/data/'
 
     def __init__(self, mode: str, cfg: Dict) -> None:
         """
         """
-        self.root_folder = os.path.join(self.DATA_ROOT, mode)
+        self.root_folder = os.path.join(self.DATA_ROOT, 'image_manifest', mode)
         self.data = dd.read_parquet(os.path.join(self.root_folder, 'data.parquet'),
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory
@@ -43,12 +43,13 @@ class VGImageDataset(Dataset):
         # print('opening image', index)
 
         # print('reading cap', index)
+        file_name = data_slice['filename'].values[0]
         image = Image.open(os.path.join(
-            self.DATA_ROOT, data_slice['filename'].values[0]))
+            self.DATA_ROOT, file_name))
 
         # print('processing img and text', index)
         image = self.preprocessor(image)
 
         # print('loaded image number', index)
 
-        return image, index
+        return image, os.path.splitext(file_name)[0]

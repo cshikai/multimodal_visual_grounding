@@ -47,17 +47,17 @@ if __name__ == '__main__':
     # Task.add_requirements("hydra-core")
     # Task.add_requirements("pytorch-lightning")
 
-    task = Task.init(project_name=PROJECT_NAME,
-                     task_name=TASK_NAME, output_uri=OUTPUT_URL)
-    task.set_base_docker(
-        docker_image=cfg['clearml']['base_image'],
-        #     # docker_setup_bash_script=[
-        #     #     'pip install pandas',
-        #     # ]
-    )
-    task.connect(cfg)
-    task.execute_remotely(
-        queue_name=cfg['clearml']['queue'], exit_process=True)
+    # task = Task.init(project_name=PROJECT_NAME,
+    #                  task_name=TASK_NAME, output_uri=OUTPUT_URL)
+    # task.set_base_docker(
+    #     docker_image=cfg['clearml']['base_image'],
+    #     #     # docker_setup_bash_script=[
+    #     #     #     'pip install pandas',
+    #     #     # ]
+    # )
+    # task.connect(cfg)
+    # task.execute_remotely(
+    #     queue_name=cfg['clearml']['queue'], exit_process=True)
     # print('done')
 
     from experiment import Experiment
@@ -67,10 +67,28 @@ if __name__ == '__main__':
     except RuntimeError:
         pass
 
-    download_models(cfg)
-    download_datasets(cfg)
+    # from data.dataset import VisualGroundingDataset
+    # from data.preprocessor import PreProcessor
+    # from torch.utils.data import DataLoader
+    # from model.model import VisualGroundingModel
+    # # download_models(cfg)
+    # # download_datasets(cfg)
+    # task = None
+    # # print(cfg)
+    # preprocessor = PreProcessor(cfg)
+    # train_dataset = VisualGroundingDataset('train', preprocessor)
+    # train_loader = DataLoader(train_dataset, collate_fn=train_dataset.preprocessor.collate,
+    #                           batch_size=cfg['training']['batch_size'], shuffle=False, num_workers=cfg['training']['num_workers'])
+    # v = VisualGroundingModel(cfg, False).cuda()
+    # for batch in train_loader:
+    #     b1, b2, b3 = batch
+    #     print(b3)
+    #     print(b2.shape)
+    #     print(b1.shape)
+    #     x = v(b1, b2, b3)
+    #     print('x1', x.shape)
+    #     break
     task = None
-    # print(cfg)
     exp = Experiment(cfg, task)
     exp.run_experiment()
     # exp.create_torchscript_model('class_model_v2.ckpt')

@@ -70,9 +70,9 @@ model:
 training:
 
     input_models:
-        # vgg: 
-        #     id: f1087001724241e79eb24c4c38e5bc1a
-        #     path: '/models/vgg/c466539746bac9f0534936c455bb5e2d.vgg16-397923af.pth'
+        vgg: 
+            id: f1087001724241e79eb24c4c38e5bc1a
+            path: '/models/vgg/c466539746bac9f0534936c455bb5e2d.vgg16-397923af.pth'
         elmo: 
             id: 6ec38b0aefb843179508a906c7cd62dc
             path: '/models/elmo/'

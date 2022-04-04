@@ -51,7 +51,7 @@ class VisualGroundingDataCreator():
             .drop(columns=['cluster_number', 'intra_group_number'])
 
         print('Creating Dask Dataset')
-        print(manifest_df)
+        print('len of df: ', len(manifest_df))
         dask_df = dd.from_pandas(manifest_df, npartitions=self.npartitions)
 
         # dask_df = dask_df.set_index('batch_number', sorted=True)

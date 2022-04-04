@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 import os
-
+import torch
 from torch.utils.data import Dataset
 import dask.dataframe as dd
 from PIL import Image
@@ -17,7 +17,7 @@ class VisualGroundingDataset(Dataset):
         """
         """
         self.root_folder = os.path.join(self.DATA_ROOT, mode)
-        self.data = dd.read_parquet(os.path.join(self.root_folder, 'data.parquet'),
+        self.data = dd.read_parquet(os.path.join(self.root_folder, 'manifest', 'data.parquet'),
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory
 
@@ -41,15 +41,18 @@ class VisualGroundingDataset(Dataset):
 
         # data values loaded are between 0 and 255, with the shape [h,w,c], c is the number of channels , usually RGB. both PIL and skimages will achieve this
         # print('opening image', index)
-        image = Image.open(os.path.join(
-            self.DATA_ROOT, data_slice['filename'].values[0]))
+        image_location = os.path.join(
+            self.root_folder, 'image', os.path.splitext(data_slice['filename'].values[0])[0])
+
+        image = torch.load(image_location)
 
         # print('reading cap', index)
-        text = data_slice['caption'].values[0]
+        text_location = os.path.join(self.root_folder, 'text', str(index))
+        text = torch.load(text_location)
 
         # print('processing img and text', index)
-        image, text, length = self.preprocessor((image, text))
+        # image, text, length = self.preprocessor((image, text))
 
         # print('loaded image number', index)
 
-        return image, text, length
+        return image, text, text.shape[0]

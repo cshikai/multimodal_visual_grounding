@@ -31,10 +31,10 @@ class PreProcessor():
     def collate(self, batch):
         # sort by len
         # batch.sort(key=lambda x: x[-1], reverse=True)
-        batch_image, batch_index,  = zip(*batch)
+        batch_image, batch_name,  = zip(*batch)
         # batch_pad_text = torch.nn.utils.rnn.pad_sequence(
         #     batch_text, batch_first=True, padding_value=0)
 
         batch_image = torch.stack(batch_image, 0)
 
-        return batch_image, batch_index
+        return batch_image, batch_name

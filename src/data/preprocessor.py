@@ -15,22 +15,22 @@ class PreProcessor():
     def __init__(self, cfg: Dict) -> None:
 
         self.cfg = cfg
-        self.image_transforms = transforms.get_transforms(
-            self.cfg['data']['transforms']['image'])
-        self.text_transforms = transforms.get_transforms(
-            self.cfg['data']['transforms']['text'])
+        # self.image_transforms = transforms.get_transforms(
+        #     self.cfg['data']['transforms']['image'])
+        # self.text_transforms = transforms.get_transforms(
+        #     self.cfg['data']['transforms']['text'])
 
-        model_root = cfg['training']['input_models']['elmo']['path']
-        self.elmo = ElmoTokenEmbedder(
-            options_file=os.path.join(model_root, self.ELMO_OPTIONS_FILE), weight_file=os.path.join(model_root, self.ELMO_WEIGHT_FILE), dropout=cfg['model']['embeddings']['elmo']['dropout'])
-        # self.elmo.cuda()
-        print('elmo embedder initialized on gpu?:',
-              next(self.elmo.parameters()).is_cuda)
+        # model_root = cfg['training']['input_models']['elmo']['path']
+        # self.elmo = ElmoTokenEmbedder(
+        #     options_file=os.path.join(model_root, self.ELMO_OPTIONS_FILE), weight_file=os.path.join(model_root, self.ELMO_WEIGHT_FILE), dropout=cfg['model']['embeddings']['elmo']['dropout'])
+        # # self.elmo.cuda()
+        # print('elmo embedder initialized on gpu?:',
+        #       next(self.elmo.parameters()).is_cuda)
 
-        for param in self.elmo._elmo.parameters():
-            param.requires_grad = False
+        # for param in self.elmo._elmo.parameters():
+        #     param.requires_grad = False
 
-        self.elmo._elmo._modules['_elmo_lstm']._elmo_lstm.stateful = False
+        # self.elmo._elmo._modules['_elmo_lstm']._elmo_lstm.stateful = False
 
     def __call__(self, data: Tuple[Image, str]) -> Tuple[torch.Tensor, torch.Tensor]:
         '''

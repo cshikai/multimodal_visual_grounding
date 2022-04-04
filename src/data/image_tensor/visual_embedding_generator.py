@@ -56,6 +56,7 @@ class EmbeddingGenerator():
     def _generate(self, dataset_root):
 
         folders = ['train', 'valid']
+        sub_folders = ['flickr', 'mscoco', 'visualgenome']
 
         self.model.cuda()
         self.model.eval()
@@ -64,41 +65,46 @@ class EmbeddingGenerator():
               next(self.model.parameters()).is_cuda)
 
         for f in folders:
-            path = os.path.join(dataset_root, f, 'image')
+            for sub_f in sub_folders:
+                path = os.path.join(dataset_root, f, 'image', sub_f)
 
-            if not os.path.exists(path):
-                os.makedirs(path)
+                if not os.path.exists(path):
+                    os.makedirs(path)
+
+        processed = 0
         train_len = len(self.train_dataset)
         for batch in self.train_loader:
-            batch_image, batch_index = batch
-            index = batch_index[0]
+            processed += 1
+            batch_image, batch_name = batch
+
             output = self.model(batch_image.cuda())
 
-            if index % self.REPORT_INTERVAL == 0:
-                print('processing train image {}/{} '.format(index+1, train_len))
+            if processed % self.REPORT_INTERVAL == 0:
+                print('processing train image {}/{} '.format(processed *
+                      self.BATCH_SIZE, train_len))
 
-            for number, idx in enumerate(batch_index):
+            for number, name in enumerate(batch_name):
                 single = output[number, ...].clone()
 
                 torch.save(
-                    single, '/data/embeddings/train/image/{}'.format(idx))
+                    single, '/data/embeddings/train/image/{}'.format(name))
 
+        processed = 0
         valid_len = len(self.valid_dataset)
         for batch in self.valid_loader:
-
-            batch_image, batch_index = batch
-            index = batch_index[0]
+            processed += 1
+            batch_image, batch_name = batch
 
             output = self.model(batch_image.cuda())
 
-            if index % self.REPORT_INTERVAL == 0:
-                print('processing valid image {}/{} '.format(index+1, valid_len))
+            if processed % self.REPORT_INTERVAL == 0:
+                print('processing valid image {}/{} '.format(processed *
+                      self.BATCH_SIZE, valid_len))
 
-            for number, idx in enumerate(batch_index):
+            for number, name in enumerate(batch_name):
                 single = output[number, ...].clone()
-
                 torch.save(
-                    single, '/data/embeddings/valid/image/{}'.format(idx))
+                    single, '/data/embeddings/valid/image/{}'.format(name))
 
     @staticmethod
     def create_torchscript_model(model_name: str) -> None:

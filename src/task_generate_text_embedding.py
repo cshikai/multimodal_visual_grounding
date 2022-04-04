@@ -45,20 +45,20 @@ if __name__ == '__main__':
     DATASET_NAME = 'text_embeddings_flickr'
     DATASET_ROOT = '/data/embeddings/'
 
-    task = Task.init(project_name=PROJECT_NAME,
-                     task_name=TASK_NAME, output_uri=OUTPUT_URL)
-    task.set_base_docker(
-        docker_image=cfg['clearml']['base_image'],
-    )
+    # task = Task.init(project_name=PROJECT_NAME,
+    #                  task_name=TASK_NAME, output_uri=OUTPUT_URL)
+    # task.set_base_docker(
+    #     docker_image=cfg['clearml']['base_image'],
+    # )
 
-    task.connect(cfg)
-    task.execute_remotely(
-        queue_name=cfg['clearml']['queue'], exit_process=True)
+    # task.connect(cfg)
+    # task.execute_remotely(
+    #     queue_name=cfg['clearml']['queue'], exit_process=True)
 
     from data.text_tensor.text_embedding_generator import EmbeddingGenerator
 
-    download_models(cfg)
-    download_datasets(cfg)
+    # download_models(cfg)
+    # download_datasets(cfg)
 
     from torch.multiprocessing import set_start_method
     try:
@@ -66,15 +66,16 @@ if __name__ == '__main__':
     except RuntimeError:
         pass
 
+    task = None
     eg = EmbeddingGenerator(cfg, task)
     eg.run(DATASET_ROOT)
 
-    clearml_dataset = Dataset.create(
-        dataset_project=PROJECT_NAME, dataset_name=DATASET_NAME)
+    # clearml_dataset = Dataset.create(
+    #     dataset_project=PROJECT_NAME, dataset_name=DATASET_NAME)
 
-    clearml_dataset.add_files(DATASET_ROOT)
-    clearml_dataset.upload(show_progress=True,
-                           verbose=True, output_url=OUTPUT_URL)
-    clearml_dataset.finalize()
+    # clearml_dataset.add_files(DATASET_ROOT)
+    # clearml_dataset.upload(show_progress=True,
+    #                        verbose=True, output_url=OUTPUT_URL)
+    # clearml_dataset.finalize()
 
     # exp.create_torchscript_model('class_model_v2.ckpt')
