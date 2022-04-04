@@ -61,11 +61,11 @@ if __name__ == '__main__':
     # print('done')
 
     from experiment import Experiment
-    from torch.multiprocessing import set_start_method
-    try:
-        set_start_method('spawn')
-    except RuntimeError:
-        pass
+    # from torch.multiprocessing import set_start_method
+    # try:
+    #     set_start_method('spawn')
+    # except RuntimeError:
+    #     pass
 
     # from data.dataset import VisualGroundingDataset
     # from data.preprocessor import PreProcessor

@@ -11,7 +11,7 @@ Task.force_requirements_env_freeze(
 Task.add_requirements("torch")
 
 
-def download_datasets(cfg: Dict) -> None:
+def download_datasets(cfg: Dict,) -> None:
     TEMP_PATH = '/tmp'
     for dataset in cfg['data']['clearml_datasets']:
         dataset_id = cfg['data']['clearml_datasets'][dataset]['id']

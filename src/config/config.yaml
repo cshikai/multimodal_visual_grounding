@@ -85,9 +85,10 @@ training:
 
     seed: 123
     num_workers: 0
-    batch_size: 8
-    n_gpu: 1
-    accelerator: 'ddp'
+    batch_size: 4
+    accumulate_grad_batches: 1
+    n_gpu: 4
+    accelerator: deepspeed #fsdp #'ddp_sharded'
     
     epochs: 20
     learning_rate: 0.001 #half at 10 and again at 15

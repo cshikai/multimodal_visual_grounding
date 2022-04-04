@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-    
-  model_training: 
-    runtime: nvidia
-    build: ../ 
-    # image: intel_model_model
+
+  model_training:
+    # runtime: nvidia
+    build: ../
+    # image: harbor.dsta.ai/public/traj-id-model
     stdin_open: true
     tty: true
     volumes:
- 
+
       - ../src:/src
       - ../data:/data
       - ../models:/models

@@ -41,6 +41,7 @@ class MultimodalAttention(pl.LightningModule):
         # aggregated_sentence_image_score = torch.log(
         #     torch.sum(aggregated_sentence_image_score, 2) ** (1/self.gamma_1))
     # aggregated_sentence_image_score, sentence_image_score
+
         return word_image_heatmap, sentence_image_heatmap, word_image_score, sentence_image_score
 
     def get_attention_heatmap(self, image_feature: torch.Tensor, word_feature: torch.Tensor, batch_size: int):

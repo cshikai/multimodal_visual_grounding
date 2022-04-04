@@ -61,8 +61,10 @@ class Experiment():
 
     def _set_trainer(self) -> None:
         self.trainer = pl.Trainer(
-            gpus=self.cfg['training']['n_gpu'],
-            accelerator=self.cfg['training']['accelerator'] if self.distributed else None,
+            devices=self.cfg['training']['n_gpu'],
+            accelerator="gpu",
+            strategy=self.cfg['training']['accelerator'] if self.distributed else None,
+            accumulate_grad_batches=self.cfg['training']['accumulate_grad_batches'],
             callbacks=self.callbacks,
             # logger=self._get_logger(),
             max_epochs=self.cfg['training']['epochs'],
