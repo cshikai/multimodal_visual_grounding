@@ -72,8 +72,27 @@ class MultimodalAttention(pl.LightningModule):
         image_feature_flat = torch.flatten(image_feature, start_dim=1, end_dim=2).permute(
             0, 2, 1, 3).unsqueeze(1).unsqueeze(1).expand(-1, batch_size, max_word_len, -1, -1, -1)
 
-        visual_word_attention = torch.matmul(
-            similarity_heatmap_flat, image_feature_flat).squeeze(4)
+        print('sim_heatmap', similarity_heatmap_flat.shape)
+        print('image_feat', image_feature_flat.shape)
+
+        va_shape = image_feature_flat.shape[0:4] + image_feature_flat.shape[5:]
+
+        visual_word_attention = torch.ones(va_shape, device='cuda')
+        print('va created')
+        # 8, 8, 23, 4, 1024
+        for b in range(image_feature_flat.shape[0]):
+            for b2 in range(image_feature_flat.shape[1]):
+                for t in range(image_feature_flat.shape[2]):
+                    visual_word_attention[b, b2, t, ...] = torch.utils.checkpoint.checkpoint(torch.bmm,
+                                                                                             similarity_heatmap_flat[b,
+                                                                                                                     b2, t, ...],
+                                                                                             image_feature_flat[b, b2, t, ...]).squeeze(1)
+        # visual_word_attention = torch.matmul(
+        #     similarity_heatmap_flat, image_feature_flat).squeeze(4)
+
+        # visual_word_attention = torch.utils.checkpoint.checkpoint(
+        #     torch.matmul, similarity_heatmap_flat, image_feature_flat).squeeze(4)
+        # print('visual word', visual_word_attention.shape)
 
         # (B,B',T,L,D)
         visual_word_attention = torch.nn.functional.normalize(

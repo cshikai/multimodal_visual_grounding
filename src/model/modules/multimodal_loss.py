@@ -45,12 +45,13 @@ class MultimodalLoss(torch.nn.Module):
         del fixed_image_score
         del fixed_sentence_score
         torch.cuda.empty_cache()
+        print('done with forward')
         return loss
 
     def _get_len_mask(self, batch_size, max_len, seq_lens):
         """Generates an 'upper-triangular matrix' with 1 in places without mask"""
-        block = torch.zeros(batch_size, max_len)
+        block = torch.zeros(batch_size, max_len, device='cuda')
         for i, l in enumerate(seq_lens):
             block[i, :l] = torch.ones(1, l)
         block = block.unsqueeze(0).expand(batch_size, -1, -1)
-        return block.cuda()
+        return block
