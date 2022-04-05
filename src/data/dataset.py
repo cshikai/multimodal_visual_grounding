@@ -54,5 +54,6 @@ class VisualGroundingDataset(Dataset):
         # image, text, length = self.preprocessor((image, text))
 
         # print('loaded image number', index)
-
+        # if text.shape[0] == 39:
+        print(data_slice['caption'].values[0])
         return image, text, text.shape[0]

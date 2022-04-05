@@ -50,7 +50,7 @@ class MultimodalLoss(torch.nn.Module):
 
     def _get_len_mask(self, batch_size, max_len, seq_lens):
         """Generates an 'upper-triangular matrix' with 1 in places without mask"""
-        block = torch.zeros(batch_size, max_len, device='cuda')
+        block = torch.zeros(batch_size, max_len, device='cuda:3')
         for i, l in enumerate(seq_lens):
             block[i, :l] = torch.ones(1, l)
         block = block.unsqueeze(0).expand(batch_size, -1, -1)

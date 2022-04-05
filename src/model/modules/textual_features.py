@@ -33,8 +33,8 @@ class TextualFeatures(pl.LightningModule):
         # self.word_fc = torch.nn.Sequential(torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(
         #     self.hidden_dim, self.hidden_dim1), self.leaky_relu)
 
-        # self.word_linear_comb = torch.nn.Linear(3, 1)
-        # self.sentence_linear_comb = torch.nn.Linear(2, 1)
+        # self.word_linear_comb = torch.nn.Linear(3, 1,bias=False)
+        # self.sentence_linear_comb = torch.nn.Linear(2, 1,bias=False)
 
         # self.word_pre_fc = torch.nn.Linear(1024, self.hidden_dim)
 
