@@ -85,7 +85,7 @@ training:
 
     seed: 123
     num_workers: 0
-    batch_size: 8
+    batch_size: 2
     accumulate_grad_batches: 1
     n_gpu: 1
     accelerator: deepspeed #fsdp #'ddp_sharded'

@@ -50,10 +50,4 @@ class VisualGroundingDataset(Dataset):
         text_location = os.path.join(self.root_folder, 'text', str(index))
         text = torch.load(text_location)
 
-        # print('processing img and text', index)
-        # image, text, length = self.preprocessor((image, text))
-
-        # print('loaded image number', index)
-        # if text.shape[0] == 39:
-        print(data_slice['caption'].values[0])
         return image, text, text.shape[0]

@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 class MultimodalAttention(pl.LightningModule):
-    SPLIT_VA_ACROSS_GPU = 4
+    SPLIT_VA_ACROSS_GPU = 1
 
     def __init__(self, cfg: Dict) -> None:
         super().__init__()
@@ -106,6 +106,7 @@ class MultimodalAttention(pl.LightningModule):
 
             visual_word_attention_l = torch.matmul(torch.flatten(
                 similarity_heatmap[gpu_id], start_dim=2, end_dim=3).permute(0, 1, 3, 4, 2).unsqueeze(4), image_feature_flat[gpu_id].to(device)).squeeze(4)
+            print(visual_word_attention_l.shape)
             visual_word_attention.append(visual_word_attention_l)
 
         # for gpu_id in range(self.SPLIT_VA_ACROSS_GPU):
@@ -142,22 +143,36 @@ class MultimodalAttention(pl.LightningModule):
         #     visual_word_attention, p=2, dim=4)
 
         # (B,B',T,L)
-        text_feature = text_feature.unsqueeze(
-            1).expand(-1, batch_size, -1, -1)
-
-        text_feature_shape = text_feature.shape
-
-        # text_feature = torch.split(
-        #     text_feature, text_feature_shape[3]//self.SPLIT_VA_ACROSS_GPU, dim=3)
         word_image_pertinence_score = []
-        for gpu_id in range(self.SPLIT_VA_ACROSS_GPU):
-            device = 'cuda:{:d}'.format(gpu_id)
 
-            word_image_pertinence_score.append(F.cosine_similarity(
-                text_feature.to(device), visual_word_attention[gpu_id].squeeze(3).to(device), dim=3))
+        if self.SPLIT_VA_ACROSS_GPU > 1:
 
-        word_image_pertinence_score = torch.stack(
-            [w.to('cuda:3') for w in word_image_pertinence_score], 3)
+            text_feature = text_feature.unsqueeze(
+                1).expand(-1, batch_size, -1, -1)
+
+            for gpu_id in range(self.SPLIT_VA_ACROSS_GPU):
+                device = 'cuda:{:d}'.format(gpu_id)
+                print('text_feat', text_feature.shape)
+                print('vw attention', visual_word_attention[gpu_id].shape)
+                word_image_pertinence_score.append(F.cosine_similarity(
+                    text_feature.to(device), visual_word_attention[gpu_id].squeeze(3).to(device), dim=3))
+
+            word_image_pertinence_score = torch.stack(
+                [w.to('cuda') for w in word_image_pertinence_score], 3)
+
+        else:
+            text_feature = text_feature.unsqueeze(2).unsqueeze(
+                1).expand(-1, batch_size, -1, self.L, -1)
+
+            for gpu_id in range(self.SPLIT_VA_ACROSS_GPU):
+                device = 'cuda:{:d}'.format(gpu_id)
+                print('text_feat', text_feature.shape)
+                print('vw attention', visual_word_attention[gpu_id].shape)
+                word_image_pertinence_score.append(F.cosine_similarity(
+                    text_feature.to(device), visual_word_attention[gpu_id].squeeze(3).to(device), dim=4))
+
+            print('wroib4', word_image_pertinence_score[0].shape)
+            word_image_pertinence_score = word_image_pertinence_score[0]
 
         # (B,B',T,)
         word_image_max_pertinence_score, _ = torch.max(

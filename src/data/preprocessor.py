@@ -56,5 +56,5 @@ class PreProcessor():
         batch_pad_text = torch.nn.utils.rnn.pad_sequence(
             batch_text, batch_first=True, padding_value=0)
         batch_image = torch.stack(batch_image, 0)
-
+        batch_len = torch.Tensor(batch_len).type(torch.int64).unsqueeze(1)
         return batch_image, batch_pad_text, batch_len
