@@ -10,13 +10,23 @@ import json
 
 class MscocoStandardizer():
 
+    WORD_LIMIT = 20
+
+    def word_count(self, string):
+        return len(string.split(" "))
+
+    def filter_long_captions(self, manifest):
+
+        manifest['word_count'] = manifest.caption.apply(self.word_count)
+        manifest = manifest[manifest.word_count <= self.WORD_LIMIT]\
+            .drop(columns=['word_count'])
+        return manifest
+
     def standardize(self, input_manifest, output_manifest):
-        # os.rename('/data/flickr30k-images', '/data/flickr')
         manifest = {'filename': [], 'caption': []}
 
         with open(input_manifest) as f:
             id2file = {}
-            no_map = []
             original_manifest = json.load(f)
 
             for image_info in original_manifest['images']:
@@ -28,30 +38,18 @@ class MscocoStandardizer():
                 manifest['filename'].append(
                     id2file[annotation_info['image_id']])
                 manifest['caption'].append(annotation_info['caption'])
-                # else:
-                #     no_map.append(annotation_info)
-        # print(len(id2file))
-        # print(len(no_map))
-        # print(manifest)
-        # print(manifest)
-        #     for line in f:
-        #         filename_captionnum, caption = line.split('\t')
-        #         filename, caption_num = filename_captionnum.split('#')
 
-        #         manifest['filename'].append('flickr/'+filename)
-        #         manifest['caption'].append(
-        #             caption.strip(' .\n').strip('''"'''))
-
-        #         # break
         manifest = pd.DataFrame(manifest)
         manifest['caption'] = manifest['caption'].apply(
             lambda x: x.strip(' ').strip('.').strip(' ').strip('\n')+'.')
+        manifest = self.filter_long_captions(manifest)
+
         manifest.to_csv(output_manifest, index=False)
 
 
 if __name__ == '__main__':
     std = MscocoStandardizer()
-    std.standardize('/data/annotations/captions_train2014.json',
-                    '/data/train_manifest_mscoco.csv')
-    std.standardize('/data/annotations/captions_val2014.json',
-                    '/data/valid_manifest_mscoco.csv')
+    std.standardize('/data/raw/captions_train2014.json',
+                    '/data/manifests/mscoco/train_manifest.csv')
+    std.standardize('/data/raw/captions_val2014.json',
+                    '/data/manifests/mscoco/valid_manifest.csv')

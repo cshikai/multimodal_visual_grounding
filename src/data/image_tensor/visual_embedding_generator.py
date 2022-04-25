@@ -87,7 +87,8 @@ class EmbeddingGenerator():
                 single = output[number, ...].clone()
 
                 torch.save(
-                    single, '/data/embeddings/train/image/{}'.format(name))
+                    single, os.path.join(
+                        dataset_root, 'train/image/{}'.format(name)))
 
         processed = 0
         valid_len = len(self.valid_dataset)
@@ -104,9 +105,10 @@ class EmbeddingGenerator():
             for number, name in enumerate(batch_name):
                 single = output[number, ...].clone()
                 torch.save(
-                    single, '/data/embeddings/valid/image/{}'.format(name))
+                    single, os.path.join(
+                        dataset_root, 'valid/image/{}'.format(name)))
 
-    @staticmethod
+    @ staticmethod
     def create_torchscript_model(model_name: str) -> None:
         model = VGG.load_from_checkpoint(model_name)
         model.eval()
@@ -117,7 +119,7 @@ class EmbeddingGenerator():
     def collate(self, batch):
         # sort by len
         # batch.sort(key=lambda x: x[-1], reverse=True)
-        batch_image, batch_index,  = zip(*batch)
+        batch_image, batch_index, = zip(*batch)
         # batch_pad_text = torch.nn.utils.rnn.pad_sequence(
         #     batch_text, batch_first=True, padding_value=0)
 

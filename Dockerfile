@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-# FROM nvcr.io/nvidia/pytorch:21.08-py3
+
 FROM nvcr.io/nvidia/pytorch:22.01-py3
 
 ENV NVIDIA_VISIBLE_DEVICES all

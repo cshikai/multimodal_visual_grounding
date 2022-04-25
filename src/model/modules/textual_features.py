@@ -51,6 +51,8 @@ class TextualFeatures(pl.LightningModule):
 
         word_feature = self.word_linear_comb(
             torch.stack([x, output_1, output_2, ], -1)).squeeze(-1)
+
+        print('word_feature', word_feature.shape)
         word_feature = self.word_fc(word_feature)
 
         # start embedding taken from the backward lstm
@@ -66,11 +68,13 @@ class TextualFeatures(pl.LightningModule):
 
         first_layer_sentence_feature = torch.cat(
             [torch.stack(sentence_end_1, 0), output_1[:, 0, self.lstm_hidden_dim:]], -1)
+
         second_layer_sentence_feature = torch.cat(
             [torch.stack(sentence_end_2, 0), output_2[:, 0, self.lstm_hidden_dim:]], -1)
+
         sentence_feature = self.sentence_linear_comb(torch.stack(
             [first_layer_sentence_feature, second_layer_sentence_feature], -1)).squeeze(-1)
+
         sentence_feature = self.sentence_fc(sentence_feature)
 
-        # return torch.ones(x.shape[0], x.shape[1], 1024).cuda(), torch.ones(x.shape[0], 1024).cuda()
         return word_feature, sentence_feature

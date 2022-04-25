@@ -11,16 +11,26 @@ from sklearn.model_selection import train_test_split
 
 
 class VgStandardizer():
+    WORD_LIMIT = 20
 
     def __init__(self, max_captions=5, valid_size=0.2):
         self.max_captions = max_captions
         self.valid_size = valid_size
         self.seed = 42
 
+    def word_count(self, string):
+        return len(string.split(" "))
+
+    def filter_long_captions(self, manifest):
+
+        manifest['word_count'] = manifest.caption.apply(self.word_count)
+        manifest = manifest[manifest.word_count <= self.WORD_LIMIT]\
+            .drop(columns=['word_count'])
+        return manifest
+
     def standardize(self):
-        # os.rename('/data/flickr30k-images', '/data/flickr')
         manifest = []
-        with open('/data/region_descriptions.json') as f:
+        with open('/data/raw/region_descriptions.json') as f:
             original_manifest = json.load(f)
 
             for i in original_manifest:
@@ -45,14 +55,15 @@ class VgStandardizer():
                     by=['size'], ascending=False).head(self.max_captions).drop(columns=['size'])
 
                 manifest.append(single_image_manifest)
-                # print(i['id'])
 
         manifest = pd.concat(manifest, ignore_index=True)
-
+        manifest = self.filter_long_captions(manifest)
         manifest_train, manifest_valid = self._train_test_split(manifest)
 
-        manifest_train.to_csv('/data/vg_train_manifest.csv', index=False)
-        manifest_valid.to_csv('/data/vg_valid_manifest.csv', index=False)
+        manifest_train.to_csv(
+            '/data/manifests/visualgenome/train_manifest.csv', index=False)
+        manifest_valid.to_csv(
+            '/data/manifests/visualgenome/valid_manifest.csv', index=False)
 
     def _train_test_split(self, df):
         df['file_id'] = df.groupby('filename').ngroup()

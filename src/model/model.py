@@ -1,4 +1,5 @@
 
+from re import S
 from typing import Dict, List, Tuple, Any
 
 import torch
@@ -57,11 +58,12 @@ class VisualGroundingModel(pl.LightningModule):
         '''
         image = batch[0]
         text = batch[1]
-        seq_len = batch[2]
+        seq_len = batch[-1]
 
         # this is calling the forward implicitly
         word_image_heatmap, sentence_image_heatmap, word_image_score, sentence_image_score = self(
             image, text, seq_len)
+
         loss = self.loss(word_image_score, sentence_image_score, seq_len)
         self.log('train_loss', loss, sync_dist=self.distributed)
         return loss
@@ -73,26 +75,81 @@ class VisualGroundingModel(pl.LightningModule):
 
         image = batch[0]
         text = batch[1]
-        seq_len = batch[2]
+
+        image_location = batch[2]
+        text_string = batch[3]
+        seq_len = batch[-1]
 
         # this is calling the forward implicitly
         word_image_heatmap, sentence_image_heatmap, word_image_score, sentence_image_score = self(
             image, text, seq_len)
+
         loss = self.loss(word_image_score, sentence_image_score, seq_len)
+        # print('weird', len(sentence_image_heatmap))
+
+        # word_image_pertinence_score dims: (B, B', T,L)
+        word_image_heatmap_stacked = torch.stack(
+            [l.squeeze().to('cpu') for l in word_image_heatmap], -1)
+
+        sentence_image_heatmap_stacked = torch.stack(
+            [l.squeeze().to('cpu') for l in sentence_image_heatmap], -1)
 
         self.log('val_loss', loss, prog_bar=True, on_step=False,
                  on_epoch=True, sync_dist=self.distributed)
 
         return {
             'val_loss': loss,
+            'word_image_heatmap': word_image_heatmap_stacked,
+            'sentence_image_heatmap': sentence_image_heatmap_stacked,
+            'image_location': image_location,
+            'text_string': text_string
         }
 
     def validation_epoch_end(self, validation_step_outputs: Dict[str, Any]) -> None:
-        pass
+        # pass
         # Log confusion matrices into tensorboard
 
-        # preds_list = list(
-        #     map(lambda x: x['predictions'], validation_step_outputs))
+        import matplotlib.image as mpimg
+        import matplotlib.pyplot as plt
+        import os
+        from textwrap import wrap
+        image_location = list(
+            map(lambda x: x['image_location'], validation_step_outputs))
+
+        text_string = list(
+            map(lambda x: x['text_string'], validation_step_outputs))
+
+        sentence_image_heatmap = list(
+            map(lambda x: x['sentence_image_heatmap'], validation_step_outputs))
+
+        word_image_heatmap = list(
+            map(lambda x: x['word_image_heatmap'], validation_step_outputs))
+
+        batch = 0
+        for i in range(len(image_location[batch])):
+            # print(image_location[batch][i])
+            img = mpimg.imread(image_location[batch][i])
+            # print(sentence_image_heatmap[batch].shape)
+            # print(word_image_heatmap[batch].shape)
+            fig, axs = plt.subplots(1, 5, )
+            imgplot = axs[0].imshow(img)
+
+            for l in range(4):
+                axs[1+l].imshow(sentence_image_heatmap[batch]
+                                [i, i, :, :, l].numpy(), cmap="YlGnBu")
+
+            title = axs[1].set_title(
+                '\n'.join(wrap(text_string[batch][i], 60)), size=4)
+
+            # title = plt.title(text_string[batch][i], width=60)
+            # title.set_y(1.05)
+
+            for ax in axs:
+                ax.set_xticks([])
+                ax.set_yticks([])
+            fig.tight_layout()
+            plt.savefig(os.path.join(
+                '/models/reports/eval', '{}_{}.png'.format(batch, i)), dpi=300)
 
         # y_pred = torch.cat(preds_list).cpu().numpy()
 
@@ -102,6 +159,14 @@ class VisualGroundingModel(pl.LightningModule):
         # if self.target_classes:
         #     cm_fig = plot_confusion_matrix(y_true, y_pred, self.class_names, self.target_classes)
         #     self.logger.experiment.add_figure('True vs Predicted Labels for Targeted Classes', cm_fig, global_step=self.current_epoch)
+
+    def get_learning_rate(self, epoch):
+        if epoch < 10:
+            return 1
+        elif epoch < 15:
+            return 0.5
+        else:
+            return 0.25
 
     def configure_optimizers(self) -> Optimizer:
         '''
@@ -151,6 +216,13 @@ class VisualGroundingModel(pl.LightningModule):
             }
         # use scale fn and scale mode to overwrite mode.
         else:
+
             optimizer = torch.optim.Adam(
                 self.parameters(), lr=self.learning_rate)
-            return optimizer
+
+            scheduler = torch.optim.lr_scheduler.LambdaLR(
+                optimizer, lr_lambda=self.get_learning_rate)
+            return {
+                'optimizer': optimizer,
+                'lr_scheduler': scheduler,
+            }

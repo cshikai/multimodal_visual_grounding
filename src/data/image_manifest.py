@@ -41,7 +41,7 @@ class ImageManifestCreator():
 
 if __name__ == '__main__':
     dc = ImageManifestCreator(100)
-    dc.create(['/data/manifest/flickr/valid_manifest.csv'],
-              '/data/image_manifest/valid')
-    dc.create(['/data/manifest/flickr/train_manifest.csv'],
-              '/data/image_manifest/train')
+    dc.create(['/data/manifests/flickr/valid_manifest.csv'],
+              '/data/image_manifest/flickr/valid')
+    dc.create(['/data/manifests/flickr/train_manifest.csv'],
+              '/data/image_manifest/flickr/train')

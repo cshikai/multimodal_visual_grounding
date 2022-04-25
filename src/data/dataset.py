@@ -46,8 +46,10 @@ class VisualGroundingDataset(Dataset):
 
         image = torch.load(image_location)
 
+        # print(image.shape)
         # print('reading cap', index)
         text_location = os.path.join(self.root_folder, 'text', str(index))
         text = torch.load(text_location)
-
-        return image, text, text.shape[0]
+        # print('text', text.shape)
+        return image, text, os.path.join(
+            '/data', data_slice['filename'].values[0]), data_slice['caption'].values[0], text.shape[0]

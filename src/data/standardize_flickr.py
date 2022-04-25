@@ -6,11 +6,28 @@ import os
 
 class FlickrStandardizer():
 
+    WORD_LIMIT = 20
+
+    def __init__(self, max_captions=5, valid_size=0.2):
+        self.max_captions = max_captions
+        self.valid_size = valid_size
+        self.seed = 42
+
+    def word_count(self, string):
+        return len(string.split(" "))
+
+    def filter_long_captions(self, manifest):
+
+        manifest['word_count'] = manifest.caption.apply(self.word_count)
+        manifest = manifest[manifest.word_count <= self.WORD_LIMIT]\
+            .drop(columns=['word_count'])
+        return manifest
+
     def __init__(self, valid_size=0.2):
         self.valid_size = valid_size
         self.seed = 42
 
-    def standardize(self, input_manifest, output_manifest):
+    def standardize(self, input_manifest):
         # os.rename('/data/flickr30k-images', '/data/flickr')
         manifest = {'filename': [], 'caption': []}
         with open(input_manifest) as f:
@@ -24,10 +41,13 @@ class FlickrStandardizer():
 
                 # break
         manifest = pd.DataFrame(manifest)
+        manifest = self.filter_long_captions(manifest)
         manifest_train, manifest_valid = self._train_test_split(manifest)
 
-        manifest_train.to_csv('/data/train_manifest.csv', index=False)
-        manifest_valid.to_csv('/data/valid_manifest.csv', index=False)
+        manifest_train.to_csv(
+            '/data/manifests/flickr/train_manifest.csv', index=False)
+        manifest_valid.to_csv(
+            '/data/manifests/flickr/valid_manifest.csv', index=False)
 
     def _train_test_split(self, df):
         df['file_id'] = df.groupby('filename').ngroup()
@@ -48,5 +68,5 @@ class FlickrStandardizer():
 
 if __name__ == '__main__':
     std = FlickrStandardizer()
-    std.standardize('/data/results_20130124.token', '/data/manifest.csv')
+    std.standardize('/data/raw/results_20130124.token')
     # std.standardize('/data/results_20130124.token', '/data/test_manifest.csv')

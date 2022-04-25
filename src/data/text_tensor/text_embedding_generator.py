@@ -52,9 +52,11 @@ class EmbeddingGenerator():
     def _set_dataloaders(self) -> None:
         # self.cfg['training']['batch_size']
         self.train_loader = DataLoader(self.train_dataset, collate_fn=self.train_dataset.preprocessor.collate,
-                                       batch_size=self.BATCH_SIZE, shuffle=False, num_workers=self.cfg['training']['num_workers'])
+                                       batch_size=self.BATCH_SIZE, shuffle=False,
+                                       num_workers=self.cfg['training']['num_workers'])
         self.valid_loader = DataLoader(self.valid_dataset, collate_fn=self.valid_dataset.preprocessor.collate,
-                                       batch_size=self.BATCH_SIZE, shuffle=False, num_workers=self.cfg['training']['num_workers'])
+                                       batch_size=self.BATCH_SIZE, shuffle=False,
+                                       num_workers=self.cfg['training']['num_workers'])
 
     def _generate(self, dataset_root):
 
@@ -71,6 +73,7 @@ class EmbeddingGenerator():
             if not os.path.exists(path):
                 os.makedirs(path)
         train_len = len(self.train_dataset)
+
         for batch in self.train_loader:
             print('Starting batch...')
             batch_text, batch_index, batch_len = batch
@@ -84,7 +87,7 @@ class EmbeddingGenerator():
                 single = output[number, :batch_len[number], ...].clone()
 
                 torch.save(
-                    single, '/data/embeddings/train/text/{}'.format(idx))
+                    single, os.path.join(dataset_root, 'train/text/{}'.format(idx)))
             print('saved embeddings to file system')
 
         valid_len = len(self.valid_dataset)
@@ -100,7 +103,7 @@ class EmbeddingGenerator():
                 single = output[number, :batch_len[number], ...].clone()
 
                 torch.save(
-                    single, '/data/embeddings/valid/text/{}'.format(idx))
+                    single, os.path.join(dataset_root, 'valid/text/{}'.format(idx)))
             print('saved embeddings to file system')
 
     @staticmethod

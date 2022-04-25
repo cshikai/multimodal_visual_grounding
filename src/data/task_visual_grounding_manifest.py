@@ -1,5 +1,6 @@
 
 
+from visual_grounding_dataset import VisualGroundingDataCreator
 import os
 from pathlib import Path
 from clearml import Dataset, Task
@@ -35,7 +36,6 @@ args = {
 
 task.connect(args)
 task.execute_remotely(queue_name='cpu-only')
-from visual_grounding_dataset import VisualGroundingDataCreator
 input_train_dataset_paths = []
 input_valid_dataset_paths = []
 
@@ -59,7 +59,7 @@ for dataset_id in args['input_manifests']:
 
 
 vg_data_creator = VisualGroundingDataCreator(
-    num_captions=args['num_captions'], nparitions=args['npartitions'], batch_size=args['batch_size'])
+    num_captions=args['num_captions'], npartitions=args['npartitions'], batch_size=args['batch_size'])
 
 
 processed_train_path = os.path.join(DATASET_ROOT, 'train')

@@ -19,15 +19,20 @@ class MultimodalLoss(torch.nn.Module):
                 seq_lens: List[int]
                 ) -> torch.Tensor:
         '''
-        word_feature dims (B,T,D)
-        image_feature dims (B,M,M,L,D)
+        word_image_max_score dims (B,B',T)
+        sentence_image_max_score dims (B,B',1)
+        seq_lens dims (B,1)        
         '''
         batch_size = word_image_max_score.shape[0]
 
         aggregated_sentence_image_score = torch.exp(
             word_image_max_score * self.gamma_1) * self._get_len_mask(batch_size, seq_lens[0], seq_lens)
+
+        # aggregated_sentence_image_score dims: (B,B')
         aggregated_sentence_image_score = torch.log(
             torch.sum(aggregated_sentence_image_score, 2) ** (1/self.gamma_1))
+
+        # sentence_image_score dims: (B,B')
         sentence_image_score = sentence_image_max_score.squeeze(2)
 
         assert sentence_image_score.shape[0] == batch_size and sentence_image_score.shape[1] == batch_size and len(
@@ -45,7 +50,6 @@ class MultimodalLoss(torch.nn.Module):
         del fixed_image_score
         del fixed_sentence_score
         torch.cuda.empty_cache()
-        print('done with forward')
         return loss
 
     def _get_len_mask(self, batch_size, max_len, seq_lens):

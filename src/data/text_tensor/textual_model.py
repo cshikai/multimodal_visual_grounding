@@ -26,6 +26,8 @@ class Elmo(pl.LightningModule):
         for param in self.elmo._elmo.parameters():
             param.requires_grad = False
 
+        self.elmo._elmo.eval()
+
         self.elmo._elmo._modules['_elmo_lstm']._elmo_lstm.stateful = False
 
     def forward(self, x: torch.Tensor, ) -> torch.Tensor:

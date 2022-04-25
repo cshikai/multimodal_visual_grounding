@@ -42,6 +42,8 @@ class VGG(pl.LightningModule):
         self.resize = torch.nn.Upsample(
             size=(self.M, self.M), scale_factor=None, mode='bilinear', align_corners=False)
 
+        self.pretrained_model.eval()
+
     def _forward_hook(self, layer_id: str):
 
         def hook(module: torch.nn.Module, input: torch.Tensor, output: torch.Tensor) -> Callable:

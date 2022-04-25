@@ -11,12 +11,13 @@ from .preprocessor import PreProcessor
 class VGTextDataset(Dataset):
     """
     """
-    DATA_ROOT = '/data'
+    DATA_ROOT = '/data/parquet/flickr'
 
     def __init__(self, mode: str, cfg: Dict) -> None:
         """
         """
         self.root_folder = os.path.join(self.DATA_ROOT, mode)
+        print(self.root_folder)
         self.data = dd.read_parquet(os.path.join(self.root_folder, 'data.parquet'),
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory

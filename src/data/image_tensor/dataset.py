@@ -16,7 +16,8 @@ class VGImageDataset(Dataset):
     def __init__(self, mode: str, cfg: Dict) -> None:
         """
         """
-        self.root_folder = os.path.join(self.DATA_ROOT, 'image_manifest', mode)
+        self.root_folder = os.path.join(
+            self.DATA_ROOT,  'image_manifest', 'flickr', mode)
         self.data = dd.read_parquet(os.path.join(self.root_folder, 'data.parquet'),
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory
