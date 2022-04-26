@@ -27,6 +27,8 @@ class VisualFeatures(pl.LightningModule):
                 else:
                     setattr(self, layer_name, torch.nn.Conv2d(
                         self.D, self.D,  kernel_size=(1, 1), stride=1))
+                torch.nn.init.kaiming_uniform_(getattr(
+                    self, layer_name).weight, mode='fan_in', a=self.alpha, nonlinearity='leaky_relu')
 
         self.leaky_relu = torch.nn.LeakyReLU(self.alpha)
 
@@ -45,6 +47,6 @@ class VisualFeatures(pl.LightningModule):
         visual_features = torch.stack(visual_features, 1)
 
         visual_features = torch.nn.functional.normalize(
-            visual_features, p=2, dim=2).permute((0, 3, 4, 1, 2))
+            visual_features, p=2, dim=2, eps=0.0005).permute((0, 3, 4, 1, 2))
 
         return visual_features

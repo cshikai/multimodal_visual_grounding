@@ -64,8 +64,8 @@ class MultimodalAttention(pl.LightningModule):
         for gpu_id in range(self.SPLIT_VA_ACROSS_GPU):
             device = 'cuda:{:d}'.format(gpu_id)
             # split heatmap dims (B,B',M,M,T,l)
-            similarity_heatmap_l = F.relu(F.cosine_similarity(
-                reshaped_word_feature.to(device), reshaped_image_feature[gpu_id].to(device), dim=6))
+            similarity_heatmap_l = F.leaky_relu(F.cosine_similarity(
+                reshaped_word_feature.to(device), reshaped_image_feature[gpu_id].to(device), dim=6), negative_slope=0.1)
             similarity_heatmap.append(similarity_heatmap_l)
         return similarity_heatmap
 
@@ -98,7 +98,7 @@ class MultimodalAttention(pl.LightningModule):
 
             # normalize across D means that there will be BxB'xTxl indepndant operations dividing each matrix[b,b',t,l,:] vector by its norm
             visual_word_attention_l = torch.nn.functional.normalize(
-                visual_word_attention_l, p=2, dim=-1)
+                visual_word_attention_l, p=2, dim=-1, eps=0.0005)
             visual_word_attention.append(visual_word_attention_l)
 
         word_image_pertinence_score = []
@@ -107,7 +107,7 @@ class MultimodalAttention(pl.LightningModule):
 
             # text feature reshaped dims : (B,B',T,D)
             text_feature = text_feature.unsqueeze(
-                1).expand(-1, batch_size, -1, -1)
+                1).expand(batch_size, -1, -1, -1)
 
             for gpu_id in range(self.SPLIT_VA_ACROSS_GPU):
                 device = 'cuda:{:d}'.format(gpu_id)

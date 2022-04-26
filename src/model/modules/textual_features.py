@@ -26,11 +26,25 @@ class TextualFeatures(pl.LightningModule):
         self.lstm_2 = torch.nn.LSTM(self.hidden_dim, self.lstm_hidden_dim,
                                     num_layers=1, dropout=self.dropout, bidirectional=True, batch_first=True,)
 
-        self.leaky_relu = torch.nn.LeakyReLU(self.relu_alpha, inplace=True)
+        # torch.nn.init.xavier_uniform_(
+        #     self.lstm_1.weight)
+
+        # torch.nn.init.xavier_uniform_(
+        #     self.lstm_2.weight)
+
+        self.leaky_relu = torch.nn.LeakyReLU(self.relu_alpha, inplace=False)
+
         self.sentence_fc = torch.nn.Sequential(torch.nn.Linear(
             self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu)
+
+        # torch.nn.init.kaiming_uniform_(
+        #     self.sentence_fc.weight, mode='fan_in', a=self.relu_alpha, nonlinearity='leaky_relu')
+
         self.word_fc = torch.nn.Sequential(torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(
             self.hidden_dim, self.hidden_dim), self.leaky_relu)
+
+        # torch.nn.init.kaiming_uniform_(
+        #     self.word_fc.weight, mode='fan_in', a=self.relu_alpha, nonlinearity='leaky_relu')
 
         self.word_linear_comb = torch.nn.Linear(3, 1, bias=False)
         self.sentence_linear_comb = torch.nn.Linear(2, 1, bias=False)
@@ -52,7 +66,7 @@ class TextualFeatures(pl.LightningModule):
         word_feature = self.word_linear_comb(
             torch.stack([x, output_1, output_2, ], -1)).squeeze(-1)
 
-        print('word_feature', word_feature.shape)
+        # print('word_feature', word_feature.shape)
         word_feature = self.word_fc(word_feature)
 
         # start embedding taken from the backward lstm

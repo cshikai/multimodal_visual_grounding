@@ -45,11 +45,15 @@ class MultimodalLoss(torch.nn.Module):
         fixed_image_score = score / torch.sum(score, dim=1, keepdim=True)
         fixed_sentence_score = score / torch.sum(score, dim=0, keepdim=True)
 
+        # print('probs', torch.sum(score, dim=1, keepdim=True))
+        print(torch.diagonal(fixed_image_score, 0))
+        print(torch.diagonal(fixed_sentence_score, 0))
+
         loss = -torch.sum(torch.log(torch.diagonal(fixed_image_score, 0)) +
                           torch.log(torch.diagonal(fixed_sentence_score, 0)))
-        del fixed_image_score
-        del fixed_sentence_score
-        torch.cuda.empty_cache()
+        # del fixed_image_score
+        # del fixed_sentence_score
+        # torch.cuda.empty_cache()
         return loss
 
     def _get_len_mask(self, batch_size, max_len, seq_lens):

@@ -220,6 +220,11 @@ class VisualGroundingModel(pl.LightningModule):
             optimizer = torch.optim.Adam(
                 self.parameters(), lr=self.learning_rate)
 
+            return {
+                'optimizer': optimizer,
+                # 'lr_scheduler': scheduler,
+            }
+
             scheduler = torch.optim.lr_scheduler.LambdaLR(
                 optimizer, lr_lambda=self.get_learning_rate)
             return {

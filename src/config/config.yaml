@@ -49,7 +49,7 @@ data:
 model:
     embeddings:
         elmo:
-            dropout: 0.5
+            dropout: 0.0
 
     feature_hidden_dimension: 1024 
     leaky_relu_alpha: 0.25

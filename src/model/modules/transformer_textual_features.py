@@ -43,7 +43,7 @@ class TextualFeatures(pl.LightningModule):
         self.positional_encoder = PositionalEncoding(
             self.D_MODEL, self.INPUT_DROPOUT)
 
-        self.leaky_relu = torch.nn.LeakyReLU(self.relu_alpha, inplace=True)
+        self.leaky_relu = torch.nn.LeakyReLU(self.relu_alpha)
         self.sentence_fc = torch.nn.Sequential(torch.nn.Linear(
             self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu)
         self.word_fc = torch.nn.Sequential(torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(
