@@ -91,7 +91,7 @@ training:
     accelerator: deepspeed #fsdp #'ddp_sharded'
     
     epochs: 2000
-    learning_rate: 0.001 #0.001 #half at 10 and again at 15
+    learning_rate: 0.0001 #0.001 #half at 10 and again at 15
     auto_lr: 0 # boolean either 1 or 0 
     lr_schedule:
         scheduler: null #string or null #'lr_cyclic' or 'lr_decay'
@@ -103,7 +103,7 @@ training:
             metric_to_track: 'val_loss'
         lr_cyclic:
             mode: 'triangular' #'triangular2' , 'exp_range'
-            lower_lr: 0.00001
+            lower_lr: 0.0001
             epoch_size_up: 5 #epoch , not step
             epoch_size_down: 5 #epoch, not step
 

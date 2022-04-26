@@ -67,7 +67,7 @@ class Experiment():
             strategy=self.cfg['training']['accelerator'],
             accumulate_grad_batches=self.cfg['training']['accumulate_grad_batches'],
             callbacks=self.callbacks,
-            # logger=self._get_logger(),
+            logger=self._get_logger(),
             max_epochs=self.cfg['training']['epochs'],
             default_root_dir=self.cfg['training']['local_trained_model_path'],
             log_every_n_steps=self.cfg['training']['log_every_n_steps']
@@ -130,7 +130,8 @@ class Experiment():
                                        batch_size=self.cfg['training']['batch_size'], shuffle=False, num_workers=self.cfg['training']['num_workers'])
 
     def _get_logger(self) -> TensorBoardLogger:
-        logger = TensorBoardLogger(self.checkpoint_dir, name='logs')
+        logger = TensorBoardLogger(
+            cfg['training']['local_trained_model_path'], name='logs')
         return logger
 
     def _set_callbacks(self) -> None:

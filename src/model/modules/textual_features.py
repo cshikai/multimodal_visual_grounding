@@ -26,23 +26,24 @@ class TextualFeatures(pl.LightningModule):
         self.lstm_2 = torch.nn.LSTM(self.hidden_dim, self.lstm_hidden_dim,
                                     num_layers=1, dropout=self.dropout, bidirectional=True, batch_first=True,)
 
-        # torch.nn.init.xavier_uniform_(
-        #     self.lstm_1.weight)
-
-        # torch.nn.init.xavier_uniform_(
-        #     self.lstm_2.weight)
+        self._initialize_lstm_weights(self.lstm_1)
+        self._initialize_lstm_weights(self.lstm_2)
 
         self.leaky_relu = torch.nn.LeakyReLU(self.relu_alpha, inplace=False)
 
         self.sentence_fc = torch.nn.Sequential(torch.nn.Linear(
             self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu)
 
+        # print(self.sentence_fc.layers)
+
+        self._intialize_fc_weights(self.sentence_fc)
         # torch.nn.init.kaiming_uniform_(
         #     self.sentence_fc.weight, mode='fan_in', a=self.relu_alpha, nonlinearity='leaky_relu')
 
         self.word_fc = torch.nn.Sequential(torch.nn.Linear(self.hidden_dim, self.hidden_dim), self.leaky_relu, torch.nn.Linear(
             self.hidden_dim, self.hidden_dim), self.leaky_relu)
 
+        self._intialize_fc_weights(self.word_fc)
         # torch.nn.init.kaiming_uniform_(
         #     self.word_fc.weight, mode='fan_in', a=self.relu_alpha, nonlinearity='leaky_relu')
 
@@ -92,3 +93,17 @@ class TextualFeatures(pl.LightningModule):
         sentence_feature = self.sentence_fc(sentence_feature)
 
         return word_feature, sentence_feature
+
+    def _initialize_lstm_weights(self, lstm):
+        for name, param in lstm.named_parameters():
+            if 'bias' in name:
+                torch.nn.init.constant_(param, 0.0)
+            else:
+                torch.nn.init.xavier_uniform_(param)
+
+    def _intialize_fc_weights(self, sequential):
+
+        torch.nn.init.kaiming_uniform_(
+            sequential[0].weight, mode='fan_in', a=self.relu_alpha, nonlinearity='leaky_relu')
+        torch.nn.init.kaiming_uniform_(
+            sequential[2].weight, mode='fan_in', a=self.relu_alpha, nonlinearity='leaky_relu')
