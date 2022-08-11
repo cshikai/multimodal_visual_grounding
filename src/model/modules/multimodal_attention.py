@@ -15,6 +15,8 @@ class MultimodalAttention(pl.LightningModule):
         self.L = cfg['model']['visual']['num_layers']
         self.M = cfg['model']['visual']['heatmap_dim']
         self.gamma_1 = cfg['model']['loss']['gamma_1']
+        self.attention_negative_slope = cfg['model']['attention_negative_slope']
+        self.l2_norm_eps = cfg['model']['l2_norm_eps']
 
     def forward(self,
                 image_feature: torch.Tensor,
@@ -65,7 +67,7 @@ class MultimodalAttention(pl.LightningModule):
             device = 'cuda:{:d}'.format(gpu_id)
             # split heatmap dims (B,B',M,M,T,l)
             similarity_heatmap_l = F.leaky_relu(F.cosine_similarity(
-                reshaped_word_feature.to(device), reshaped_image_feature[gpu_id].to(device), dim=6), negative_slope=0.1)
+                reshaped_word_feature.to(device), reshaped_image_feature[gpu_id].to(device), dim=6), negative_slope=self.attention_negative_slope)
             similarity_heatmap.append(similarity_heatmap_l)
         return similarity_heatmap
 
@@ -98,7 +100,7 @@ class MultimodalAttention(pl.LightningModule):
 
             # normalize across D means that there will be BxB'xTxl indepndant operations dividing each matrix[b,b',t,l,:] vector by its norm
             visual_word_attention_l = torch.nn.functional.normalize(
-                visual_word_attention_l, p=2, dim=-1, eps=0.0005)
+                visual_word_attention_l, p=2, dim=-1, eps=self.l2_norm_eps)
             visual_word_attention.append(visual_word_attention_l)
 
         word_image_pertinence_score = []

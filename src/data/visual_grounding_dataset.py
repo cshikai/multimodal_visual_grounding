@@ -7,7 +7,7 @@ import dask.dataframe as dd
 
 class VisualGroundingDataCreator():
 
-    def __init__(self, batch_size: int = 32, num_captions: int = 5, npartitions: int = 100):
+    def __init__(self, batch_size: int = 8, num_captions: int = 5, npartitions: int = 100):
         self.batch_size = batch_size
         self.num_captions = num_captions
         self.npartitions = npartitions
@@ -27,6 +27,10 @@ class VisualGroundingDataCreator():
             single_manifest_df = pd.read_csv(manifest)
             manifest_df.append(single_manifest_df)
         manifest_df = pd.concat(manifest_df, ignore_index=True)
+
+        # only take images that have at least num_captions
+        manifest_df = manifest_df.groupby('filename').filter(
+            lambda x: len(x) >= self.num_captions)
 
         print('Extracting the top {} captions'.format(self.num_captions))
         manifest_df = manifest_df.groupby(
@@ -57,10 +61,10 @@ class VisualGroundingDataCreator():
         manifest_df = manifest_df.reset_index(drop=True)
 
         manifest_df.to_csv(os.path.join(destination_folder, 'data.csv'))
-        dask_df = dd.from_pandas(manifest_df.head(
-            16), npartitions=self.npartitions)
+        # dask_df = dd.from_pandas(manifest_df.head(
+        #     16), npartitions=self.npartitions)
 
-        print('WHY DARK EMPTY', len(dask_df))
+        dask_df = dd.from_pandas(manifest_df, npartitions=self.npartitions)
 
         # dask_df = dask_df.set_index('batch_number', sorted=True)
         # only fastparquet preserve categoricals
@@ -73,7 +77,7 @@ class VisualGroundingDataCreator():
 if __name__ == '__main__':
     dc = VisualGroundingDataCreator(
         batch_size=8, num_captions=5, npartitions=100)
-    dc.create(['/data/manifests/flickr/valid_manifest.csv'],
-              '/data/parquet/flickr_sub/valid')
-    dc.create(['/data/manifests/flickr/train_manifest.csv'],
-              '/data/parquet/flickr_sub/train')
+    dc.create(['/data/manifests/flickr/valid_manifest.csv', '/data/manifests/mscoco/valid_manifest.csv', '/data/manifests/visualgenome/valid_manifest.csv'],
+              '/data/parquet/flickr_mscoco_visualgenome/valid')
+    dc.create(['/data/manifests/flickr/train_manifest.csv', '/data/manifests/mscoco/train_manifest.csv', '/data/manifests/visualgenome/train_manifest.csv'],
+              '/data/parquet/flickr_mscoco_visualgenome/train')

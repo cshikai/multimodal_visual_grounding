@@ -40,8 +40,8 @@ class ImageManifestCreator():
 
 
 if __name__ == '__main__':
-    dc = ImageManifestCreator(100)
-    dc.create(['/data/manifests/flickr/valid_manifest.csv'],
-              '/data/image_manifest/flickr/valid')
-    dc.create(['/data/manifests/flickr/train_manifest.csv'],
-              '/data/image_manifest/flickr/train')
+    dc = ImageManifestCreator(npartitions=100)
+    dc.create(['/data/manifests/flickr/valid_manifest.csv', '/data/manifests/mscoco/valid_manifest.csv', '/data/manifests/visualgenome/valid_manifest.csv'],
+              '/data/image_manifest/flickr_mscoco_visualgenome/valid')
+    dc.create(['/data/manifests/flickr/train_manifest.csv', '/data/manifests/mscoco/train_manifest.csv', '/data/manifests/visualgenome/train_manifest.csv'],
+              '/data/image_manifest/flickr_mscoco_visualgenome/train')

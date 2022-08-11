@@ -10,9 +10,9 @@ clearml:
     
 data:
     clearml_datasets:
-        flickr_manifest:
-            id: 03b19522a67b40a7ba138605f0080160
-            path: '/data/'
+        # flickr_manifest:
+        #     id: 03b19522a67b40a7ba138605f0080160
+        #     path: '/data/'
         # full_manifest:
         #     id: #ab4ccbef42d646b28c4fe29b933a15ce
         #     path: '/data/' 
@@ -22,9 +22,9 @@ data:
         # flickr:
         #     id: 4b07c0410f704e61b4ce0157208c09fd
         #     path: '/data/'
-        # visualgenome:
-        #     id: b589ad32f99849b5a97f4b944ff9a708
-        #     path: '/data/'
+        visualgenome:
+            id: b589ad32f99849b5a97f4b944ff9a708
+            path: '/data/'
     
     transforms:
         text:
@@ -51,8 +51,11 @@ model:
         elmo:
             dropout: 0.0
 
-    feature_hidden_dimension: 1024 
+    feature_hidden_dimension: 1024
+    attention_negative_slope: 0.1 
+    l2_norm_eps: 0.0005
     leaky_relu_alpha: 0.25
+    
     textual:
         lstm:
             input_dims: 1024
@@ -90,7 +93,7 @@ training:
     n_gpu: 1
     accelerator: deepspeed #fsdp #'ddp_sharded'
     
-    epochs: 2000
+    epochs: 20
     learning_rate: 0.0001 #0.001 #half at 10 and again at 15
     auto_lr: 0 # boolean either 1 or 0 
     lr_schedule:

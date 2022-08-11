@@ -3,6 +3,9 @@ from pathlib import Path
 from clearml import Dataset
 
 
+# print(os.getcwd())
+
+
 class VisualGroundingDatasetDownloader():
     DATA_ROOT = '/data'
     TEMP_ROOT = '/temp'
@@ -21,19 +24,20 @@ class VisualGroundingDatasetDownloader():
         # input_train_dataset_paths = []
         # input_valid_dataset_paths = []
 
-        manifest_path = Dataset.get(dataset_id=self.cfg['manifest_dataset'])
+        # manifest_path = Dataset.get(dataset_id=self.cfg['manifest_dataset'])
 
-        for data_mode in ['train', 'valid']:
+        # for data_mode in ['train', 'valid']:
 
-            os.rename(os.path.join(manifest_path, data_mode), os.path.join(
-                self.DATA_ROOT, data_mode))
+        #     os.rename(os.path.join(manifest_path, data_mode), os.path.join(
+        #         self.DATA_ROOT, data_mode))
 
         input_image_folder_paths = []
 
-        for dataset_id in self.cfg['input_image_datasets']:
+        for dataset_name in self.cfg['data']['clearml_datasets']:
+            dataset_id = self.cfg['data']['clearml_datasets'][dataset_name]['id']
             dataset = Dataset.get(dataset_id=dataset_id)
             local_root_path = dataset.get_mutable_local_copy(
-                os.path.join(self.TEMP_PATH, dataset_id))
+                os.path.join(self.TEMP_ROOT, dataset_id))
 
             image_folder = [os.path.join(local_root_path, name) for name in os.listdir(
                 local_root_path) if os.path.isdir(os.path.join(local_root_path, name))][0]
@@ -43,3 +47,8 @@ class VisualGroundingDatasetDownloader():
         for image_folder_path in input_image_folder_paths:
             os.rename(image_folder_path, os.path.join(
                 self.DATA_ROOT, Path(image_folder_path).stem))
+
+
+if __name__ == '__main__':
+    downloader = VisualGroundingDatasetDownloader()
+    downloader.download()

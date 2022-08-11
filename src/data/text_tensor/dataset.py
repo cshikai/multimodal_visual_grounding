@@ -11,7 +11,7 @@ from .preprocessor import PreProcessor
 class VGTextDataset(Dataset):
     """
     """
-    DATA_ROOT = '/data/parquet/flickr'
+    DATA_ROOT = '/data/parquet/flickr_mscoco_visualgenome'
 
     def __init__(self, mode: str, cfg: Dict) -> None:
         """

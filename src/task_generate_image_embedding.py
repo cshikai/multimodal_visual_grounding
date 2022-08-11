@@ -43,7 +43,7 @@ if __name__ == '__main__':
     TASK_NAME = 'visual_embedding_generation'
     OUTPUT_URL = 's3://experiment-logging/multimodal'
     DATASET_NAME = 'visual_embeddings_flickr'
-    DATASET_ROOT = '/data/embeddings/flickr'
+    DATASET_ROOT = '/data/embeddings/flickr_mscoco_visualgenome'
 
     # task = Task.init(project_name=PROJECT_NAME,
     #                  task_name=TASK_NAME, output_uri=OUTPUT_URL)

@@ -2,6 +2,11 @@
 from re import S
 from typing import Dict, List, Tuple, Any
 
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import os
+from textwrap import wrap
+
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import pytorch_lightning as pl
@@ -65,7 +70,7 @@ class VisualGroundingModel(pl.LightningModule):
             image, text, seq_len)
 
         loss = self.loss(word_image_score, sentence_image_score, seq_len)
-        self.log('train_loss', loss, sync_dist=self.distributed)
+        self.log('train_loss', loss, sync_dist=self.distributed, on_step=True)
         return loss
 
     def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int) -> Dict[str, Any]:
@@ -97,59 +102,81 @@ class VisualGroundingModel(pl.LightningModule):
         self.log('val_loss', loss, prog_bar=True, on_step=False,
                  on_epoch=True, sync_dist=self.distributed)
 
+        if batch_idx == 0 or batch_idx == 1:
+            for i in range(len(image_location)):
+                img = mpimg.imread(image_location[i])
+
+                fig, axs = plt.subplots(1, 5, )
+                imgplot = axs[0].imshow(img)
+
+                for l in range(4):
+                    axs[1+l].imshow(sentence_image_heatmap_stacked
+                                    [i, i, :, :, l].numpy(), cmap="YlGnBu")
+
+                title = axs[1].set_title(
+                    '\n'.join(wrap(text_string[i], 60)), size=4)
+
+                for ax in axs:
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                fig.tight_layout()
+                plt.savefig(os.path.join(
+                    '/models/reports/eval', '{}_{}.png'.format(batch_idx, i)), dpi=300)
+
         return {
             'val_loss': loss,
-            'word_image_heatmap': word_image_heatmap_stacked,
-            'sentence_image_heatmap': sentence_image_heatmap_stacked,
-            'image_location': image_location,
-            'text_string': text_string
+            # 'word_image_heatmap': word_image_heatmap_stacked,
+            # 'sentence_image_heatmap': sentence_image_heatmap_stacked,
+            # 'image_location': image_location,
+            # 'text_string': text_string
         }
 
     def validation_epoch_end(self, validation_step_outputs: Dict[str, Any]) -> None:
+        pass
         # pass
         # Log confusion matrices into tensorboard
 
-        import matplotlib.image as mpimg
-        import matplotlib.pyplot as plt
-        import os
-        from textwrap import wrap
-        image_location = list(
-            map(lambda x: x['image_location'], validation_step_outputs))
+        # import matplotlib.image as mpimg
+        # import matplotlib.pyplot as plt
+        # import os
+        # from textwrap import wrap
+        # image_location = list(
+        #     map(lambda x: x['image_location'], validation_step_outputs))
 
-        text_string = list(
-            map(lambda x: x['text_string'], validation_step_outputs))
+        # text_string = list(
+        #     map(lambda x: x['text_string'], validation_step_outputs))
 
-        sentence_image_heatmap = list(
-            map(lambda x: x['sentence_image_heatmap'], validation_step_outputs))
+        # sentence_image_heatmap = list(
+        #     map(lambda x: x['sentence_image_heatmap'], validation_step_outputs))
 
-        word_image_heatmap = list(
-            map(lambda x: x['word_image_heatmap'], validation_step_outputs))
+        # word_image_heatmap = list(
+        #     map(lambda x: x['word_image_heatmap'], validation_step_outputs))
 
-        batch = 0
-        for i in range(len(image_location[batch])):
-            # print(image_location[batch][i])
-            img = mpimg.imread(image_location[batch][i])
-            # print(sentence_image_heatmap[batch].shape)
-            # print(word_image_heatmap[batch].shape)
-            fig, axs = plt.subplots(1, 5, )
-            imgplot = axs[0].imshow(img)
+        # batch = 0
+        # for i in range(len(image_location[batch])):
+        #     # print(image_location[batch][i])
+        #     img = mpimg.imread(image_location[batch][i])
+        #     # print(sentence_image_heatmap[batch].shape)
+        #     # print(word_image_heatmap[batch].shape)
+        #     fig, axs = plt.subplots(1, 5, )
+        #     imgplot = axs[0].imshow(img)
 
-            for l in range(4):
-                axs[1+l].imshow(sentence_image_heatmap[batch]
-                                [i, i, :, :, l].numpy(), cmap="YlGnBu")
+        #     for l in range(4):
+        #         axs[1+l].imshow(sentence_image_heatmap[batch]
+        #                         [i, i, :, :, l].numpy(), cmap="YlGnBu")
 
-            title = axs[1].set_title(
-                '\n'.join(wrap(text_string[batch][i], 60)), size=4)
+        #     title = axs[1].set_title(
+        #         '\n'.join(wrap(text_string[batch][i], 60)), size=4)
 
-            # title = plt.title(text_string[batch][i], width=60)
-            # title.set_y(1.05)
+        #     # title = plt.title(text_string[batch][i], width=60)
+        #     # title.set_y(1.05)
 
-            for ax in axs:
-                ax.set_xticks([])
-                ax.set_yticks([])
-            fig.tight_layout()
-            plt.savefig(os.path.join(
-                '/models/reports/eval', '{}_{}.png'.format(batch, i)), dpi=300)
+        #     for ax in axs:
+        #         ax.set_xticks([])
+        #         ax.set_yticks([])
+        #     fig.tight_layout()
+        #     plt.savefig(os.path.join(
+        #         '/models/reports/eval', '{}_{}.png'.format(batch, i)), dpi=300)
 
         # y_pred = torch.cat(preds_list).cpu().numpy()
 
@@ -220,10 +247,10 @@ class VisualGroundingModel(pl.LightningModule):
             optimizer = torch.optim.Adam(
                 self.parameters(), lr=self.learning_rate)
 
-            return {
-                'optimizer': optimizer,
-                # 'lr_scheduler': scheduler,
-            }
+            # return {
+            #     'optimizer': optimizer,
+            #     # 'lr_scheduler': scheduler,
+            # }
 
             scheduler = torch.optim.lr_scheduler.LambdaLR(
                 optimizer, lr_lambda=self.get_learning_rate)

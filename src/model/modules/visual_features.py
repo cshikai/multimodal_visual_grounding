@@ -17,6 +17,7 @@ class VisualFeatures(pl.LightningModule):
         self.num_layers = cfg['model']['visual']['num_layers']
         self.alpha = cfg['model']['leaky_relu_alpha']
         self.D = cfg['model']['feature_hidden_dimension']
+        self.l2_norm_eps = cfg['model']['l2_norm_eps']
 
         for l in range(self.num_layers):
             for i in range(self.num_conv_per_layer):
@@ -47,6 +48,6 @@ class VisualFeatures(pl.LightningModule):
         visual_features = torch.stack(visual_features, 1)
 
         visual_features = torch.nn.functional.normalize(
-            visual_features, p=2, dim=2, eps=0.0005).permute((0, 3, 4, 1, 2))
+            visual_features, p=2, dim=2, eps=self.l2_norm_eps).permute((0, 3, 4, 1, 2))
 
         return visual_features

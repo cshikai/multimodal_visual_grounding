@@ -17,7 +17,7 @@ class VGImageDataset(Dataset):
         """
         """
         self.root_folder = os.path.join(
-            self.DATA_ROOT,  'image_manifest', 'flickr', mode)
+            self.DATA_ROOT,  'image_manifest', 'flickr_mscoco_visualgenome', mode)
         self.data = dd.read_parquet(os.path.join(self.root_folder, 'data.parquet'),
                                     columns=['filename', 'caption'],
                                     engine='fastparquet')  # this is lazy loading, its not actually loading into memory
@@ -48,9 +48,13 @@ class VGImageDataset(Dataset):
         image = Image.open(os.path.join(
             self.DATA_ROOT, file_name))
 
-        # print('processing img and text', index)
-        image = self.preprocessor(image)
+        # convert greyscale to rgb
+        if len(image.split()) != 3:
+            rgbimg = Image.new("RGB", image.size)
+            rgbimg.paste(image)
+            image = rgbimg
 
+        image = self.preprocessor(image)
         # print('loaded image number', index)
 
         return image, os.path.splitext(file_name)[0]
