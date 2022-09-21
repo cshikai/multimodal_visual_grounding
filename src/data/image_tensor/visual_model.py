@@ -68,8 +68,8 @@ class VGG(pl.LightningModule):
 class ResNet(pl.LightningModule):
     """
     """
-    FEATURE_LAYERS_ID = [(7, 0), (7, 1), (7, 2)
-                         ]  # Conv of Layer 4 of ResNet 34
+    # FEATURE_LAYERS_ID = [(7, 0), (7, 1), (7, 2)] # Layer 4
+    FEATURE_LAYERS_ID = [(6, 0), (6, 2), (6, 3), (6, 5)] # Layer 3 
     layer_dict_key = [str(a) for a in range(len(FEATURE_LAYERS_ID))]
 
     def __init__(self, cfg: Dict) -> None:

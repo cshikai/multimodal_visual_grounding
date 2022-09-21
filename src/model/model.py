@@ -109,7 +109,7 @@ class VisualGroundingModel(pl.LightningModule):
                 fig, axs = plt.subplots(1, 5, )
                 imgplot = axs[0].imshow(img)
 
-                for l in range(3):
+                for l in range(4):
                     axs[1+l].imshow(sentence_image_heatmap_stacked
                                     [i, i, :, :, l].numpy(), cmap="YlGnBu")
 

@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 class MultimodalAttention(pl.LightningModule):
-    SPLIT_VA_ACROSS_GPU = 3
+    SPLIT_VA_ACROSS_GPU = 4
 
     def __init__(self, cfg: Dict) -> None:
         super().__init__()
