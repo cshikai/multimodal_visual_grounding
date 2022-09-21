@@ -63,8 +63,8 @@ model:
             dropout: 0.0
     
     visual:
-        num_layers: 4 
-        num_conv_per_layer : 3
+        num_layers: 3 #4 for VGG16
+        num_conv_per_layer : 2 #3 for VGG16
         heatmap_dim: 18
         
     loss:
@@ -76,6 +76,10 @@ training:
         vgg: 
             id: f1087001724241e79eb24c4c38e5bc1a
             path: '/models/vgg/c466539746bac9f0534936c455bb5e2d.vgg16-397923af.pth'
+        resnet:
+            id: resnet34
+            path: '/models/resnet/resnet34-333f7ec4.pth'
+
         elmo: 
             id: 6ec38b0aefb843179508a906c7cd62dc
             path: '/models/elmo/'

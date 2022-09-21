@@ -1,6 +1,7 @@
 
 import os
 from typing import Dict
+from tqdm import tqdm
 
 
 import pytorch_lightning as pl
@@ -10,7 +11,7 @@ from torch.utils.data import DataLoader
 
 
 from config.config import cfg
-from .visual_model import VGG
+from .visual_model import VGG, ResNet
 from .dataset import VGImageDataset
 from .preprocessor import PreProcessor
 
@@ -40,7 +41,8 @@ class EmbeddingGenerator():
         self._generate(dataset_root)
 
     def _initialize_model(self) -> None:
-        self.model = VGG(self.cfg)
+        # self.model = VGG(self.cfg)
+        self.model = ResNet(self.cfg)
 
     def _set_datasets(self) -> None:
         self.train_dataset = VGImageDataset('train', cfg)
@@ -73,34 +75,33 @@ class EmbeddingGenerator():
 
         processed = 0
         train_len = len(self.train_dataset)
-        for batch in self.train_loader:
+        for batch in tqdm(self.train_loader):
             processed += 1
             batch_image, batch_name = batch
 
             output = self.model(batch_image.cuda())
 
-            if processed % self.REPORT_INTERVAL == 0:
-                print('processing train image {}/{} '.format(processed *
-                      self.BATCH_SIZE, train_len))
+            # if processed % self.REPORT_INTERVAL == 0:
+            #     print('processing train image {}/{} '.format(processed *
+            #           self.BATCH_SIZE, train_len))
 
             for number, name in enumerate(batch_name):
                 single = output[number, ...].clone()
-
                 torch.save(
                     single, os.path.join(
                         dataset_root, 'train/image/{}'.format(name)))
 
         processed = 0
         valid_len = len(self.valid_dataset)
-        for batch in self.valid_loader:
+        for batch in tqdm(self.valid_loader):
             processed += 1
             batch_image, batch_name = batch
 
             output = self.model(batch_image.cuda())
 
-            if processed % self.REPORT_INTERVAL == 0:
-                print('processing valid image {}/{} '.format(processed *
-                      self.BATCH_SIZE, valid_len))
+            # if processed % self.REPORT_INTERVAL == 0:
+            #     print('processing valid image {}/{} '.format(processed *
+            #           self.BATCH_SIZE, valid_len))
 
             for number, name in enumerate(batch_name):
                 single = output[number, ...].clone()
@@ -110,7 +111,8 @@ class EmbeddingGenerator():
 
     @ staticmethod
     def create_torchscript_model(model_name: str) -> None:
-        model = VGG.load_from_checkpoint(model_name)
+        # model = VGG.load_from_checkpoint(model_name)
+        model = ResNet.load_from_checkpoint(model_name)
         model.eval()
         script = model.to_torchscript()
         torch.jit.save(script, os.path.join(

@@ -2,9 +2,9 @@
 from clearml import Task, OutputModel
 
 PROJECT_NAME = "multimodal"
-MODEL_NAME = "elmo"
+MODEL_NAME = "resnet"
 OUTPUT_URL = "s3://experiment-logging/multimodal"
-LOCAL_MODEL_PATH = '../../models/elmo/'
+LOCAL_MODEL_PATH = '../../models/resnet/'
 task = Task.init(project_name=PROJECT_NAME,
                  task_name=MODEL_NAME, output_uri=OUTPUT_URL)
 
