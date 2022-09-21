@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 class MultimodalAttention(pl.LightningModule):
-    SPLIT_VA_ACROSS_GPU = 4
+    SPLIT_VA_ACROSS_GPU = 3
 
     def __init__(self, cfg: Dict) -> None:
         super().__init__()
@@ -53,6 +53,7 @@ class MultimodalAttention(pl.LightningModule):
             1).expand(-1, batch_size, -1, -1, max_word_len, -1, -1)
 
         # after splitting, image_feature flat dims : (B,B,M,M,T,l,D)
+        # SJ: Maybe modulo instead? 3 layers/4 result in 0
         reshaped_image_feature = torch.split(
             reshaped_image_feature, reshaped_image_feature.shape[5]//self.SPLIT_VA_ACROSS_GPU, dim=5)
 
