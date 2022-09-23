@@ -24,7 +24,7 @@ class VisualFeatures(pl.LightningModule):
                 layer_name = str(l)+'_conv_' + str(i)
                 if i == 0:
                     setattr(self, layer_name, torch.nn.Conv2d(
-                        512, self.D,  kernel_size=(1, 1), stride=1))
+                        256, self.D,  kernel_size=(1, 1), stride=1))
                 else:
                     setattr(self, layer_name, torch.nn.Conv2d(
                         self.D, self.D,  kernel_size=(1, 1), stride=1))
