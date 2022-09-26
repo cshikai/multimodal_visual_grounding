@@ -41,7 +41,11 @@ class ImageManifestCreator():
 
 if __name__ == '__main__':
     dc = ImageManifestCreator(npartitions=100)
-    dc.create(['/data/manifests/flickr/valid_manifest.csv', '/data/manifests/mscoco/valid_manifest.csv', '/data/manifests/visualgenome/valid_manifest.csv'],
-              '/data/image_manifest/flickr_mscoco_visualgenome/valid')
-    dc.create(['/data/manifests/flickr/train_manifest.csv', '/data/manifests/mscoco/train_manifest.csv', '/data/manifests/visualgenome/train_manifest.csv'],
-              '/data/image_manifest/flickr_mscoco_visualgenome/train')
+    # dc.create(['/data/manifests/flickr/valid_manifest.csv', '/data/manifests/mscoco/valid_manifest.csv', '/data/manifests/visualgenome/valid_manifest.csv'],
+    #           '/data/image_manifest/flickr_mscoco_visualgenome/valid')
+    # dc.create(['/data/manifests/flickr/train_manifest.csv', '/data/manifests/mscoco/train_manifest.csv', '/data/manifests/visualgenome/train_manifest.csv'],
+    #           '/data/image_manifest/flickr_mscoco_visualgenome/train')
+    dc.create(['/data/manifests/m2e2/valid_manifest.csv'],
+              '/data/image_manifest/m2e2/valid')
+    dc.create(['/data/manifests/m2e2/train_manifest.csv'],
+              '/data/image_manifest/m2e2/train')

@@ -56,7 +56,8 @@ class EmbeddingGenerator():
     def _generate(self, dataset_root):
 
         folders = ['train', 'valid']
-        sub_folders = ['flickr', 'mscoco', 'visualgenome']
+        # sub_folders = ['flickr', 'mscoco', 'visualgenome']
+        sub_folders = ['images_m2e2']
 
         self.model.cuda()
         self.model.eval()
