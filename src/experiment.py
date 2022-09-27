@@ -105,14 +105,16 @@ class Experiment():
 
     def _load_model(self) -> None:
 
-        if self.task:
+        if self.clearml_task:
             local_trained_model_path = StorageManager.get_local_copy(
                 cfg['training']['trained_model_id'])
         else:
             local_trained_model_path = os.path.join(
-                cfg['training']['local_trained_model_path'], 'latest_model.ckpt')
+                cfg['training']['local_trained_model_path'], 'model.ckpt')
+        # self.model = VisualGroundingModel.load_from_checkpoint(
+        #     local_trained_model_path, self.cfg, self.distributed)
         self.model = VisualGroundingModel.load_from_checkpoint(
-            local_trained_model_path, self.cfg, self.distributed)
+            local_trained_model_path)
 
     def _set_datasets(self) -> None:
         preprocessor = PreProcessor(cfg)

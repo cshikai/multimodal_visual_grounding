@@ -82,7 +82,7 @@ if __name__ == '__main__':
     # dc.create(['/data/manifests/flickr/train_manifest.csv', '/data/manifests/mscoco/train_manifest.csv', '/data/manifests/visualgenome/train_manifest.csv'],
     #           '/data/parquet/flickr_mscoco_visualgenome/train')
     dc = VisualGroundingDataCreator(
-        batch_size=8, num_captions=1, npartitions=100)
+        batch_size=4, num_captions=1, npartitions=100)
     dc.create(['/data/manifests/m2e2/valid_manifest.csv'],
               '/data/parquet/m2e2/valid')
     dc.create(['/data/manifests/m2e2/train_manifest.csv'],

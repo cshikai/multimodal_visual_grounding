@@ -80,7 +80,7 @@ training:
             id: 6ec38b0aefb843179508a906c7cd62dc
             path: '/models/elmo/'
 
-    resume_from_checkpoint: 0 # 0 or 1
+    resume_from_checkpoint: 1 # 0 or 1
     trained_model_id: '/models/trained_models/'
     local_trained_model_path: '/models/trained_models/'
     model_save_period: 1 # models are saved at the end of every <model_save_period> epoch
@@ -88,7 +88,7 @@ training:
 
     seed: 123
     num_workers: 0
-    batch_size: 8
+    batch_size: 4
     accumulate_grad_batches: 4
     n_gpu: 1
     accelerator: deepspeed #fsdp #'ddp_sharded'

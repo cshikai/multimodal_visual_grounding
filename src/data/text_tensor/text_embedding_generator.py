@@ -19,7 +19,8 @@ from .preprocessor import PreProcessor
 
 class EmbeddingGenerator():
     REPORT_INTERVAL = 1
-    BATCH_SIZE = 256*2
+    # BATCH_SIZE = 256*2
+    BATCH_SIZE = 256
    # should init as arguments here
 
     def __init__(self, cfg: Dict, clearml_task=None) -> None:
